@@ -1,0 +1,24 @@
+Package: NTS
+Title: Nonlinear Time Series Analysis
+Version: 1.0.0
+Authors@R: c(
+    person("Ruey", "Tsay", email = "ruey.tsay@chicagobooth.edu", role = "aut"),
+    person("Rong", "Chen", email = "rongchen@stat.rutgers.edu", role = "aut"),
+    person("Xialu", "Liu", email = "xialu.liu@sdsu.edu", role = c("aut", "cre")))
+Author: Ruey Tsay [aut],
+  Rong Chen [aut],
+  Xialu Liu [aut, cre]
+Maintainer: Xialu Liu <xialu.liu@sdsu.edu>
+Description: Simulation, estimation, prediction procedure, and model identification methods for nonlinear time series analysis, including threshold autoregressive models, Markov-switching models, convolutional functional autoregressive models, nonlinearity tests, Kalman filters and various sequential Monte Carlo methods. More examples and details about this package can be found in the book "Nonlinear Time Series Analysis" by Ruey S. Tsay and Rong Chen, Wiley, 2018 (ISBN: 978-1-119-26407-1).
+Depends: R (>= 3.5.0)
+License: GPL (>= 2)
+Encoding: UTF-8
+LazyData: true
+Imports:
+        base,dlm,graphics,MASS,MSwM,Rdpack,parallel,splines,stats,tensor
+RdMacros: Rdpack
+RoxygenNote: 6.1.1
+NeedsCompilation: no
+Packaged: 2018-12-04 01:44:20 UTC; xliu
+Repository: CRAN
+Date/Publication: 2018-12-09 16:20:03 UTC
