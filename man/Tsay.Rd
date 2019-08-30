@@ -12,14 +12,15 @@ Tsay(y, p = 1)
 \item{p}{AR order.}
 }
 \value{
-The function outputs the F statistic, p value, and the degrees of freedom. The null hypothsis is there is no nonlinearity.
+The function outputs the F statistic, p value, and the degrees of freedom. The null hypothesis is there is no nonlinearity.
 }
 \description{
 Perform Tsay (1986) nonlinearity test.
 }
 \examples{
-y=MSM.sim(100,c(1,1),0.7,-0.5,c(0.5,0.6),c(1,1),c(0,0),500)
-Tsay(y$series,1)
+phi=t(matrix(c(-0.3, 0.5,0.6,-0.3),2,2))
+y=uTAR.sim(nob=2000, arorder=c(2,2), phi=phi, d=2, thr=0.2, cnst=c(1,-1),sigma=c(1, 1))
+Tsay(y$series,2)
 }
 \references{
 Tsay, R. (1986) Nonlinearity tests for time series. \emph{Biometrika} \strong{73}(2), 461-466.

@@ -1,8 +1,3 @@
-# Hello, world!
-#
-# This is an example function named 'hello'
-# which prints 'Hello, world!'.
-#
 # You can learn more about package authoring with RStudio at:
 #
 #   http://r-pkgs.had.co.nz/
@@ -12,15 +7,11 @@
 #   Build and Reload Package:  'Ctrl + Shift + B'
 #   Check Package:             'Ctrl + Shift + E'
 #   Test Package:              'Ctrl + Shift + T'
-#' @export
-hello <- function() {
-  print("Hello, world!")
-}
 
 
-#' Estimation of Autoregressive Condtional Mean Models
+#' Estimation of Autoregressive Conditional Mean Models
 #'
-#' Estimation of autoregressive conditionl mean models with exogeneous variables.
+#' Estimation of autoregressive conditional mean models with exogenous variables.
 #' @param y time series of counts.
 #' @param order the order of ACM model.
 #' @param X matrix of exogenous variables.
@@ -33,9 +24,15 @@ hello <- function() {
 #' \item{residuals}{residuals.}
 #' \item{sresi}{standardized residuals.}
 #' @examples
-#' X=matrix(rnorm(100,100,1))
-#' y=rpois(100,10)
-#' ACMx(y,c(1,1),X,"po")
+#' x=rnorm(1000)*0.1
+#' y=matrix(0,1000,1)
+#' y[1]=2
+#' lambda=matrix(0,1000,1)
+#' for (i in 2:1000){
+#' 	lambda[i]=2+0.2*y[i-1]/exp(x[i-1])+0.5*lambda[i-1]
+#' 	y[i]=rpois(1,exp(x[i])*lambda[i])
+#' }
+#' ACMx(y,order=c(1,1),x,"po")
 #' @import stats
 #' @export
 "ACMx" <- function(y,order=c(1,1),X=NULL,cond.dist="po",ini=NULL){
@@ -422,8 +419,9 @@ hello <- function() {
 #' @param tmax length of time.
 #' @param rho parameter for O-U process (noise process).
 #' @param phi_func convolutional function. Default is density function of normal distribution with mean 0 and standard deviation 0.1.
-#' @param grid the number of grid points used to constrcut the functional time series. Default is 1000.
+#' @param grid the number of grid points used to construct the functional time series. Default is 1000.
 #' @param sigma the standard deviation of O-U process. Default is 1.
+#' @param ini the burn-in period.
 #' @references
 #' Liu, X., Xiao, H., and Chen, R. (2016) Convolutional autoregressive models for functional time series. \emph{Journal of Econometrics}, 194, 263-282.
 #' @return The function returns a list with components:
@@ -434,9 +432,9 @@ hello <- function() {
 #' {
 #'  	return(dnorm(x,mean=0,sd=0.1))
 #' }
-#' y=g_cfar1(1000,5,phi_func)
+#' y=g_cfar1(1000,5,phi_func,grid=1000,sigma=1,ini=100)
 #' @export
-g_cfar1 <- function(tmax=1001,rho=5,phi_func=NULL,grid=1000,sigma=1){
+g_cfar1 <- function(tmax=1001,rho=5,phi_func=NULL,grid=1000,sigma=1,ini=100){
   #################################
   ###Simulate CFAR(1) processes
   #############################
@@ -457,6 +455,9 @@ g_cfar1 <- function(tmax=1001,rho=5,phi_func=NULL,grid=1000,sigma=1){
   }
   if(is.null(sigma)){
     sigma=1
+  }
+  if(is.null(ini)){
+    ini=100
   }
   #########################################################################################################
   #### OUTPUTS
@@ -482,15 +483,15 @@ g_cfar1 <- function(tmax=1001,rho=5,phi_func=NULL,grid=1000,sigma=1){
   #### A matrix f_grid is generated, with (tmax*iter) rows and (grid+1) columns.
   #### It contains iter CFAR(1) processes. The i-th process is in rows (i-1)*tmax+1:tmax.
 
-  f_grid=matrix(0,tmax,grid+1)
+  f_grid=matrix(0,tmax+ini,grid+1)
   i=1
   eps_grid= arima.sim(n= grid+1, model=list(ar=fi),rand.gen= function(n)sqrt((1-fi^2))*rnorm(n,0,1))  ###error process
   f_grid[1,]= eps_grid;
-  for (i in 2:tmax){
+  for (i in 2:(tmax+ini)){
     eps_grid= arima.sim(n= grid+1, model=list(ar=fi),rand.gen= function(n)sqrt(1-fi^2)*rnorm(n,0,1))
     f_grid[i,]= phi_matrix%*%f_grid[i-1,]+ eps_grid;
   }
-  g_cfar1 <- list(cfar1=f_grid*sigma,epsilon=eps_grid*sigma)
+  g_cfar1 <- list(cfar1=f_grid[(ini+1):(tmax+ini),]*sigma,epsilon=eps_grid*sigma)
   return(g_cfar1)
 }
 
@@ -502,8 +503,9 @@ g_cfar1 <- function(tmax=1001,rho=5,phi_func=NULL,grid=1000,sigma=1){
 #' @param rho parameter for O-U process (noise process).
 #' @param phi_func1 the first convolutional function. Default is 0.5*x^2+0.5*x+0.13.
 #' @param phi_func2 the second convolutional function. Default is 0.7*x^4-0.1*x^3-0.15*x.
-#' @param grid the number of grid points used to constrcut the functional time series. Default is 1000.
+#' @param grid the number of grid points used to construct the functional time series. Default is 1000.
 #' @param sigma the standard deviation of O-U process. Default is 1.
+#' @param ini the burn-in period.
 #' @references
 #' Liu, X., Xiao, H., and Chen, R. (2016) Convolutional autoregressive models for functional time series. \emph{Journal of Econometrics}, 194, 263-282.
 #' @return The function returns a list with components:
@@ -516,9 +518,9 @@ g_cfar1 <- function(tmax=1001,rho=5,phi_func=NULL,grid=1000,sigma=1){
 #' phi_func2= function(x){
 #'	return(0.7*x^4-0.1*x^3-0.15*x)
 #' }
-#' y=g_cfar2(1000,5,phi_func1,phi_func2)
+#' y=g_cfar2(1000,5,phi_func1,phi_func2,grid=1000,sigma=1,ini=100)
 #' @export
-g_cfar2 <- function(tmax=1001,rho=5,phi_func1=NULL, phi_func2=NULL,grid=1000,sigma=1){
+g_cfar2 <- function(tmax=1001,rho=5,phi_func1=NULL, phi_func2=NULL,grid=1000,sigma=1,ini=100){
   #################################
   ###Simulate CFAR(2) processes
 
@@ -551,6 +553,9 @@ g_cfar2 <- function(tmax=1001,rho=5,phi_func1=NULL, phi_func2=NULL,grid=1000,sig
   if(is.null(sigma)){
     sigma=1
   }
+  if(is.null(ini)){
+    ini=100
+  }
   #######################################################################################################
   x_grid= seq(0, 1, by= 1/grid);	### the grid points for input variables of functional time series in [0,1]
   b_grid= seq(-1, 1, by=1/grid);	### the grid points for input variables of b-spline functions in [-1,1]
@@ -574,7 +579,7 @@ g_cfar2 <- function(tmax=1001,rho=5,phi_func1=NULL, phi_func2=NULL,grid=1000,sig
   #### A matrix f_grid is generated, with (tmax*iter) rows and (grid+1) columns.
   ##  It contains iter CFAR(2) processes. The i-th process is in rows (i-1)*tmax+1:tmax.
 
-  f_grid=matrix(0,tmax,grid+1)
+  f_grid=matrix(0,tmax+ini,grid+1)
   i=1
   eps_grid= arima.sim(n= grid+1, model=list(ar=fi),rand.gen= function(n)sqrt(1-fi^2)*rnorm(n,0,1))
   f_grid[1,]= eps_grid;
@@ -596,15 +601,16 @@ g_cfar2 <- function(tmax=1001,rho=5,phi_func1=NULL, phi_func2=NULL,grid=1000,sig
 #' @param tmax length of time.
 #' @param rho parameter for O-U process (noise process).
 #' @param phi_list the convolutional function(s). Default is the density function of normal distribution with mean 0 and standard deviation 0.1.
-#' @param grid the number of grid points used to constrcut the functional time series. Default is 1000.
+#' @param grid the number of grid points used to construct the functional time series. Default is 1000.
 #' @param sigma the standard deviation of O-U process. Default is 1.
+#' @param ini the burn-in period.
 #' @references
 #' Liu, X., Xiao, H., and Chen, R. (2016) Convolutional autoregressive models for functional time series. \emph{Journal of Econometrics}, 194, 263-282.
 #' @return The function returns a list with components:
-#' \item{cfar}{a tmax-by-(grid+1) matrix following a CFAR(1) process.}
+#' \item{cfar}{a tmax-by-(grid+1) matrix following a CFAR(p) process.}
 #' \item{epsilon}{the innovation at time tmax.}
 #' @export
-g_cfar <- function(tmax=1001,rho=5,phi_list=NULL, grid=1000,sigma=1){
+g_cfar <- function(tmax=1001,rho=5,phi_list=NULL, grid=1000,sigma=1,ini=100){
   #################################
   ###Simulate CFAR processes
 
@@ -633,6 +639,9 @@ g_cfar <- function(tmax=1001,rho=5,phi_list=NULL, grid=1000,sigma=1){
   if(is.null(sigma)){
     sigma=1
   }
+  if(is.null(ini)){
+    ini=100
+  }
   #######################################################################################################
   x_grid= seq(0, 1, by= 1/grid);	### the grid points for input variables of functional time series in [0,1]
   b_grid= seq(-1, 1, by=1/grid);	### the grid points for input variables of b-spline functions in [-1,1]
@@ -658,7 +667,7 @@ g_cfar <- function(tmax=1001,rho=5,phi_list=NULL, grid=1000,sigma=1){
   #### A matrix f_grid is generated, with (tmax*iter) rows and (grid+1) columns.
   ##  It contains iter CFAR(2) processes. The i-th process is in rows (i-1)*tmax+1:tmax.
 
-  f_grid=matrix(0,tmax,grid+1)
+  f_grid=matrix(0,tmax+ini,grid+1)
   i=1
   eps_grid= arima.sim(n= grid+1, model=list(ar=fi),rand.gen= function(n)sqrt(1-fi^2)*rnorm(n,0,1))
   f_grid[1,]= eps_grid;
@@ -668,12 +677,12 @@ g_cfar <- function(tmax=1001,rho=5,phi_list=NULL, grid=1000,sigma=1){
       f_grid[i,]= phi_matrix[,1:((i-1)*(grid+1))]%*%matrix(t(f_grid[(i-1):1,]),(i-1)*(grid+1),1)+ eps_grid;
     }
   }
-  for (i in (p+1):tmax){
+  for (i in (p+1):(tmax+ini)){
     eps_grid= arima.sim(n= grid+1, model=list(ar=fi),rand.gen= function(n)sqrt(1-fi^2)*rnorm(n,0,1))
     f_grid[i,]= phi_matrix%*%matrix(t(f_grid[(i-p):(i-1),]),p*(grid+1),1)+ eps_grid;
   }
   ### The last iteration of epsilon_t is returned.
-  g_cfar <- list(cfar=f_grid*sigma,epsilon=eps_grid*sigma)
+  g_cfar <- list(cfar=f_grid[(ini+1):(tmax+ini),]*sigma,epsilon=eps_grid*sigma)
 }
 
 
@@ -682,13 +691,14 @@ g_cfar <- function(tmax=1001,rho=5,phi_list=NULL, grid=1000,sigma=1){
 #'
 #' Generate a convolutional functional autoregressive process of order 2 with heteroscedasticity, irregular observation locations.
 #' @param tmax length of time.
-#' @param grid the number of grid points used to constrcut the functional time series.
+#' @param grid the number of grid points used to construct the functional time series.
 #' @param rho parameter for O-U process (noise process).
 #' @param min_obs the minimum number of observations at each time.
 #' @param pois the mean for Poisson distribution. The number of observations at each follows a Poisson distribution plus min_obs.
 #' @param phi_func1 the first convolutional function. Default is 0.5*x^2+0.5*x+0.13.
 #' @param phi_func2 the second convolutional function. Default is 0.7*x^4-0.1*x^3-0.15*x.
 #' @param weight the weight function to determine the standard deviation of O-U process (noise process). Default is 1.
+#' @param ini the burn-in period.
 #' @references
 #' Liu, X., Xiao, H., and Chen, R. (2016) Convolutional autoregressive models for functional time series. \emph{Journal of Econometrics}, 194, 263-282.
 #' @return The function returns a list with components:
@@ -703,7 +713,7 @@ g_cfar <- function(tmax=1001,rho=5,phi_list=NULL, grid=1000,sigma=1){
 #' }
 #' y=g_cfar2h(200,1000,1,40,5,phi_func1=phi_func1,phi_func2=phi_func2)
 #' @export
-g_cfar2h <- function(tmax=1001,grid=1000,rho=1,min_obs=40, pois=5,phi_func1=NULL, phi_func2=NULL, weight=NULL){
+g_cfar2h <- function(tmax=1001,grid=1000,rho=1,min_obs=40, pois=5,phi_func1=NULL, phi_func2=NULL, weight=NULL, ini=100){
   #################################
   ###Simulate CFAR(2) processes with heteroscedasticity, irregular observation locations
   ###################################################################################
@@ -743,6 +753,9 @@ g_cfar2h <- function(tmax=1001,grid=1000,rho=1,min_obs=40, pois=5,phi_func1=NULL
       return(((w<=0.6)*exp(-10*w)+(w>0.6)*(exp(-6)+0.2*(w-0.6))+0.1)/const)
     }
   }
+  if(is.null(ini)){
+    ini=100
+  }
   num_full=rpois(tmax,pois)+min_obs	###number of observations at time t follows a Poisson distribution
   ###plus a number, minimal observations is required
   #########################################################################
@@ -768,20 +781,20 @@ g_cfar2h <- function(tmax=1001,grid=1000,rho=1,min_obs=40, pois=5,phi_func1=NULL
   for(k in 1:(tmax)){
     x_pos_full[k,1:num_full[k]]=sort(runif(num_full[k]))
   }
-  f_grid=matrix(0,tmax,grid+1)
+  f_grid=matrix(0,tmax+ini,grid+1)
   i=1
   eps_grid= arima.sim(n= grid+1, model=list(ar=fi),rand.gen= function(n)sqrt(1-fi^2)*rnorm(n,0,1))
   f_grid[1,]= eps_grid*weight(x_grid);
   i=2
   f_grid[i,]= phi_matrix1 %*% as.matrix(f_grid[i-1,])+ eps_grid*weight(x_grid);
-  for (i in 3:tmax){
+  for (i in 3:(tmax+ini)){
     eps_grid= arima.sim(n= grid+1, model=list(ar=fi),rand.gen= function(n)sqrt(1-fi^2)*rnorm(n,0,1))
     f_grid[i,]= phi_matrix1%*%as.matrix(f_grid[i-1,]) + phi_matrix2%*%as.matrix(f_grid[i-2,])+ eps_grid*weight(x_grid);
   }
 
   ### Functional time series, number of observations at different time of periods,
   ### observation points at different time of periods, the last iteration of epsilon_t is returned.
-  g_cfar2h <- list(cfar2h=f_grid, num_obs=num_full, x_pos=x_pos_full,epsilon=eps_grid)
+  g_cfar2h <- list(cfar2h=f_grid[(ini+1):(tmax+ini),], num_obs=num_full, x_pos=x_pos_full,epsilon=eps_grid)
 }
 
 #' Estimation of a CFAR Process
@@ -790,12 +803,12 @@ g_cfar2h <- function(tmax=1001,grid=1000,rho=1,min_obs=40, pois=5,phi_func1=NULL
 #' @param f the functional time series.
 #' @param p CFAR order.
 #' @param df_b the degrees of freedom for natural cubic splines. Default is 10.
-#' @param grid the number of gird points used to constrct the functional time series and noise process. Default is 1000.
+#' @param grid the number of gird points used to construct the functional time series and noise process. Default is 1000.
 #' @references
 #' Liu, X., Xiao, H., and Chen, R. (2016) Convolutional autoregressive models for functional time series. \emph{Journal of Econometrics}, 194, 263-282.
 #' @return The function returns a list with components:
-#' \item{phi_coef}{estimated spline coefficients for convluaional function(s).}
-#' \item{phi_func}{estimated convoluational function(s).}
+#' \item{phi_coef}{estimated spline coefficients for convolutional function values, a (2*grid+1)-by-p matrix.}
+#' \item{phi_func}{estimated convolutional function(s), a (df_b+1)-by-p matrix.}
 #' \item{rho}{estimated rho for O-U process (noise process).}
 #' \item{sigma}{estimated sigma for O-U process (noise process).}
 #' @import splines
@@ -843,7 +856,7 @@ est_cfar <- function(f,p=3,df_b=10,grid=1000){
   df=n;
   coef= df+1
 
-  ###convolutions of b-pline functions (df=df) for phi_1 and phi_2 and basis functions (df=n) for x
+  ###convolutions of b-spline functions (df=df) for phi_1 and phi_2 and basis functions (df=n) for x
   x_grid_full= cbind(rep(1,grid+1), x_grid_sp);
   b_grid_full= cbind(rep(1,2*grid+1), b_grid_sp);
   b_matrix=matrix(0,grid+1,grid+1)
@@ -949,9 +962,9 @@ est_cfar <- function(f,p=3,df_b=10,grid=1000){
     ehat= epart+ehat
   }
   rho_hat= -log(psi)*n
-  sigma_hat=ehat/((t-p)*(n+1))*2*rho_hat/(1-psi^2)
+  sigma_hat=sqrt(ehat/((t-p)*(n+1))/(1-psi^2))
   phi_coef=t(matrix(phihat,coef_b,p))
-  est_cfar <- list(phi_coef=phi_coef,phi_func=phihat_func,rho=rho_hat,sigma2=sigma_hat)
+  est_cfar <- list(phi_coef=phi_coef,phi_func=phihat_func,rho=rho_hat,sigma=sigma_hat)
   return(est_cfar)
 }
 
@@ -962,7 +975,7 @@ est_cfar <- function(f,p=3,df_b=10,grid=1000){
 #' @param f the functional time series.
 #' @param p.max maximum CFAR order. Default is 6.
 #' @param df_b the degrees of freedom for natural cubic splines. Default is 10.
-#' @param grid the number of gird points used to constrct the functional time series and noise process. Default is 1000.
+#' @param grid the number of gird points used to construct the functional time series and noise process. Default is 1000.
 #' @references
 #' Liu, X., Xiao, H., and Chen, R. (2016) Convolutional autoregressive models for functional time series. \emph{Journal of Econometrics}, 194, 263-282.
 #' @return The function outputs F test statistics and their p-values.
@@ -1004,9 +1017,9 @@ F_test_cfar <- function(f,p.max=6,df_b=10,grid=1000){
   index= 1:(n+1)*(grid/n)-(grid/n)+1
   x_grid_sp= bs(x_grid, df=n, degree=1);	###basis function values if we interpolate discrete observations of x_t
   x_sp= x_grid_sp[index,];			###basis function values at each observation point
-  df=n;			### number of interplolation of X_t
+  df=n;			### number of interpolation of X_t
   coef= df+1;
-  ###convolutions of b-pline functions (df=df_b) for phi and basis functions (df=n) for x
+  ###convolutions of b-spline functions (df=df_b) for phi and basis functions (df=n) for x
   x_grid_full= cbind(rep(1,grid+1), x_grid_sp);
   b_grid_full= cbind(rep(1,2*grid+1), b_grid_sp);
   b_matrix=matrix(0,grid+1,grid+1)
@@ -1165,8 +1178,8 @@ F_test_cfar <- function(f,p.max=6,df_b=10,grid=1000){
 #' F test for a CFAR process with heteroscedasticity and irregular observation locations to specify the CFAR order.
 #' @param f the functional time series.
 #' @param weight the covariance functions for noise process.
-#' @param p.max maximum CFAR order. Default is 3.
-#' @param grid the number of gird points used to constrct the functional time series and noise process. Default is 1000.
+#' @param p.max the maximum CFAR order. Default is 3.
+#' @param grid the number of gird points used to construct the functional time series and noise process. Default is 1000.
 #' @param df_b the degrees of freedom for natural cubic splines. Default is 10.
 #' @param num_obs the numbers of observations. It is a t-by-1 vector, where t is the length of time.
 #' @param x_pos the observation location matrix. If the locations are regular, it is a t-by-(n+1) matrix with all entries 1/n.
@@ -1237,7 +1250,7 @@ F_test_cfarh <- function(f,weight,p.max=3,grid=1000,df_b=10,num_obs=NULL,x_pos=N
       }
       bstar_grid[, j]= b_matrix %*% matrix(rec_x$y,ncol=1,nrow=grid+1)
     }
-    bstar_grid_full[(i-1)*(grid+1)+1:(grid+1),]=bstar_grid	###convoluttion of basis spline function and x_t
+    bstar_grid_full[(i-1)*(grid+1)+1:(grid+1),]=bstar_grid	###convolution of basis spline function and x_t
     tmp=bstar_grid[index[i+1,1:num_obs[i+1]],]
     indep[(i-1)*(n+1)+1:num_obs[i+1],]=tmp
   }
@@ -1501,21 +1514,21 @@ F_test_cfarh <- function(f,weight,p.max=3,grid=1000,df_b=10,num_obs=NULL,x_pos=N
 
 
 
-#' Estimation of a CFAR Process with Heteroscedasticity and Irregualr Observation Locations
+#' Estimation of a CFAR Process with Heteroscedasticity and Irregualar Observation Locations
 #'
-#' Estimation of a CFAR process with heteroscedasticity and irregualr observation locations.
+#' Estimation of a CFAR process with heteroscedasticity and irregualar observation locations.
 #' @param f the functional time series.
 #' @param weight the covariance functions of noise process.
 #' @param p CFAR order.
-#' @param grid the number of gird points used to constrct the functional time series and noise process. Default is 1000.
+#' @param grid the number of gird points used to construct the functional time series and noise process. Default is 1000.
 #' @param df_b the degrees of freedom for natural cubic splines. Default is 10.
 #' @param num_obs the numbers of observations. It is a t-by-1 vector, where t is the length of time.
 #' @param x_pos the observation location matrix. If the locations are regular, it is a t-by-(n+1) matrix with all entries 1/n.
 #' @references
 #' Liu, X., Xiao, H., and Chen, R. (2016) Convolutional autoregressive models for functional time series. \emph{Journal of Econometrics}, 194, 263-282.
 #' @return The function returns a list with components:
-#' \item{phi_coef}{estimated spline coefficients for convluaional function(s).}
-#' \item{phi_func}{estimated convoluational function(s).}
+#' \item{phi_coef}{estimated spline coefficients for convolutional function(s).}
+#' \item{phi_func}{estimated convolutional function(s).}
 #' \item{rho}{estimated rho for O-U process (noise process).}
 #' \item{sigma}{estimated sigma for O-U process (noise process).}
 #' @export
@@ -1583,7 +1596,7 @@ est_cfarh <- function(f,weight,p=2,grid=1000,df_b=5, num_obs=NULL,x_pos=NULL){
       }
       bstar_grid[, j]= b_matrix %*% matrix(rec_x$y,ncol=1,nrow=grid+1)
     }
-    bstar_grid_full[(i-1)*(grid+1)+1:(grid+1),]=bstar_grid	###convoluttion of basis spline function and x_t
+    bstar_grid_full[(i-1)*(grid+1)+1:(grid+1),]=bstar_grid	###convolution of basis spline function and x_t
     tmp=bstar_grid[index[i+1,1:num_obs[i+1]],]
     indep[(i-1)*(n+1)+1:num_obs[i+1],]=tmp
   }
@@ -1756,10 +1769,10 @@ est_cfarh <- function(f,weight,p=2,grid=1000,df_b=5, num_obs=NULL,x_pos=NULL){
       ehat= epart+ehat
     }
     rho_hat= -log(psi)
-    sigma_hat=ehat/sum(num_obs[(p+1):t])*2*rho_hat
+    sigma_hat=sqrt(ehat/sum(num_obs[(p+1):t]))
   }
 
-  est_cfarh <- list(phi_coef=t(matrix(phihat,df_b+1,p)),phi_func=phihat_func, rho=rho_hat, sigma2=sigma_hat)
+  est_cfarh <- list(phi_coef=t(matrix(phihat,df_b+1,p)),phi_func=phihat_func, rho=rho_hat, sigma=sigma_hat)
   return(est_cfarh)
 }
 
@@ -1769,7 +1782,7 @@ est_cfarh <- function(f,weight,p=2,grid=1000,df_b=5, num_obs=NULL,x_pos=NULL){
 #' Prediction of CFAR processes.
 #' @param model CFAR model.
 #' @param f the functional time series data.
-#' @param m the forecasting horizon.
+#' @param m the forecast horizon.
 #' @references
 #' Liu, X., Xiao, H., and Chen, R. (2016) Convolutional autoregressive models for functional time series. \emph{Journal of Econometrics}, 194, 263-282.
 #' @return The function returns a prediction of the CFAR process.
@@ -1789,7 +1802,7 @@ p_cfar <- function(model, f, m=3){
   ###p_cfar: this function gives us the prediction of functional time series. There are 3 input variables:
   ###1. model is the estimated model obtained from est_cfar function
   ###2. f is the matrix which contains the data
-  ###3. m is the forecasting horizon
+  ###3. m is the forecast horizon
 
   ####################
   ###parameter setting
@@ -1831,17 +1844,6 @@ p_cfar <- function(model, f, m=3){
 #' @references
 #' Liu, X., Xiao, H., and Chen, R. (2016) Convolutional autoregressive models for functional time series. \emph{Journal of Econometrics}, 194, 263-282.
 #' @return The function returns a prediction of the CFAR process.
-#' @examples
-#' phi_func= function(x)
-#' {
-#'  	return(dnorm(x,mean=0,sd=0.1))
-#' }
-#' y=g_cfar1(100,5,phi_func)
-#' f_grid=y$cfar
-#' index=seq(1,1001,by=10)
-#' f=f_grid[,index]
-#' est=est_cfar(f,1)
-#' pred=p_cfar_part(est,f,0)
 #' @export
 p_cfar_part  <- function(model, f, new.obs){
   ##p-cfar_part: this function gives us the prediction of x_t(s), s>s_0, give x_1,\ldots, x_{t-1}, and x(s), s <s_0. There are three input variables.
@@ -1969,7 +1971,7 @@ p_cfar_part  <- function(model, f, new.obs){
 #' @param d delay for threshold variable, default is 1.
 #' @param thrV threshold variable. If thrV is not null, it must have the same length as that of y.
 #' @param Trim lower and upper quantiles for possible threshold values.
-#' @param k0 the maximum number of threshold values to be evaluated. If the sample size is large (> 3000), then k0 = floor(nT*0.5).The default is k0=300. But k0 = floor(nT*0.8) if nT < 300.
+#' @param k0 the maximum number of threshold values to be evaluated. If the sample size is large (> 3000), then k0 = floor(nT*0.5). The default is k0=300. But k0 = floor(nT*0.8) if nT < 300.
 #' @param include.mean a logical value indicating whether constant terms are included.
 #' @param thrQ lower and upper quantiles to search for threshold value.
 #' @references
@@ -1979,7 +1981,7 @@ p_cfar_part  <- function(model, f, new.obs){
 #' \item{arorder}{AR orders of regimes 1 and 2.}
 #' \item{delay}{the delay for threshold variable.}
 #' \item{residuals}{estimated innovations.}
-#' \item{coef}{a 2-by-(p+1) matrices. The first row show the estimation results in regime 1, and the second row shows these in regime 2.}
+#' \item{coef}{a 2-by-(p+1) matrices. The first row shows the estimation results in regime 1, and the second row shows these in regime 2.}
 #' \item{sigma}{estimated innovational covariance matrices of regimes 1 and 2.}
 #' \item{nobs}{numbers of observations in regimes 1 and 2.}
 #' \item{model1,model2}{estimated models of regimes 1 and 2.}
@@ -1990,12 +1992,12 @@ p_cfar_part  <- function(model, f, new.obs){
 #' \item{cnst}{logical values indicating whether the constant terms are included in regimes 1 and 2.}
 #' \item{sresi}{standardized residuals.}
 #' @examples
-#' arorder=rep(1,2)
-#' ar.coef=matrix(c(0.7,-0.8),2,1)
-#' y=uTAR.sim(100,arorder,ar.coef,1,0)
-#' est=uTAR(y$series,1,1,1,y$series,c(0.2,0.8),100,TRUE,c(0.2,0.8))
+#' phi=t(matrix(c(-0.3, 0.5,0.6,-0.3),2,2))
+#' y=uTAR.sim(nob=2000, arorder=c(2,2), phi=phi, d=2, thr=0.2, cnst=c(1,-1),sigma=c(1, 1))
+#' est=uTAR(y=y$series,p1=2,p2=2,d=2,k0=50,thrQ=c(0,1),Trim=c(0.1,0.9),include.mean=TRUE)
 #' @export
-"uTAR" <- function(y,p1,p2,d=1,thrV=NULL,Trim=c(0.15,0.85),k0=300,include.mean=T,thrQ=c(0,1)){
+"uTAR" <- function(y,p1,p2,d=1,thrV=NULL,Trim=c(0.1,0.9),k0=300,include.mean=TRUE,thrQ=c(0,1)){
+
   if(is.matrix(y))y=y[,1]
   p = max(p1,p2)
   if(p < 1)p=1
@@ -2004,6 +2006,13 @@ p_cfar_part  <- function(model, f, new.obs){
   ### regression framework
   if(k0 > nT)k0 <- floor(nT*0.8)
   if(nT > 3000)k0 <- floor(nT*0.5)
+  ### built in checking
+  nT1 <- nT
+  if(!is.null(thrV))nT1 <- length(thrV)
+  if(nT != nT1){
+    cat("Input error at thrV. Reset to a SETAR model","\n")
+    thrV <- y
+  }
   yt <- y[ist:nT]
   nobe <- nT-ist+1
   x1 <- NULL
@@ -2013,7 +2022,7 @@ p_cfar_part  <- function(model, f, new.obs){
   if(length(thrV) < nT){
     tV <- y[(ist-d):(nT-d)]
   }else{
-    tV <- thrV[ist:nT]
+    tV <- thrV[(ist-d):(nT-d)]
   }
   D <- NeSS(yt,x1,x2=NULL,thrV=tV,Trim=Trim,k0=k0,include.mean=include.mean,thrQ=thrQ)
   #cat("Threshold candidates: ",D,"\n")
@@ -2090,6 +2099,7 @@ p_cfar_part  <- function(model, f, new.obs){
     cat("Overal MLE of sigma: ",sqrt(sigmasq),"\n")
     cat("Overall AIC: ",AIC,"\n")
   }else{cat("No threshold found: Try again with a larger k0.","\n")}
+
   uTAR <- list(data=y,arorder=c(p1,p2),delay=d,residuals = resi, coefs = Phi, sigma=Sigma,
                nobs = Size, model1 = m1a, model2 = m1b,thr=thr, D=D, RSS=RSS,AIC = AIC,
                cnst = rep(include.mean,2), sresi=sresi)
@@ -2104,18 +2114,16 @@ p_cfar_part  <- function(model, f, new.obs){
 #' It is a conservative approach, but might be more reliable than the Li and Tong (2016) procedure.
 #' @param y a vector of time series.
 #' @param p1,p2 AR-orders of regime 1 and regime 2.
-#' @param d delay for threshold variable, default is 1.
+#' @param d delay for threshold variable, default is 1. (Apply to the external threshold variable too.)
 #' @param thrV threshold variable. if it is not null, thrV must have the same length as that of y.
 #' @param thrQ lower and upper limits for the possible threshold values.
 #' @param Trim lower and upper trimming to control the sample size in each regime.
 #' @param include.mean a logical value for including constant term.
-#' @references
-#' Li, D., and Tong. H. (2016) Nested sub-sample search algorithm for estimation of threshold models. \emph{Statisitca Sinica}, 1543-1554.
 #' @return uTAR.grid returns a list with components:
 #' \item{data}{the data matrix, y.}
 #' \item{arorder}{AR orders of regimes 1 and 2.}
 #' \item{residuals}{estimated innovations.}
-#' \item{coefs}{a 2-by-(p+1) matrices. The first row show the estimation results in regime 1, and the second row shows these in regime 2.}
+#' \item{coefs}{a 2-by-(p+1) matrices. The first row shows the estimation results in regime 1, and the second row shows these in regime 2.}
 #' \item{sigma}{estimated innovational covariance matrices of regimes 1 and 2.}
 #' \item{nobs}{numbers of observations in regimes 1 and 2.}
 #' \item{delay}{the delay for threshold variable.}
@@ -2127,10 +2135,9 @@ p_cfar_part  <- function(model, f, new.obs){
 #' \item{information}{information criterion.}
 #' \item{sresi}{standardized residuals.}
 #' @examples
-#' arorder=rep(1,2)
-#' ar.coef=matrix(c(0.7,-0.8),2,1)
-#' y=uTAR.sim(100,arorder,ar.coef,1,0)
-#' uTAR.grid(y$series,1,1,1,y$series,c(0,1),c(0.2,0.8),TRUE)
+#' phi=t(matrix(c(-0.3, 0.5,0.6,-0.3),2,2))
+#' y=uTAR.sim(nob=2000, arorder=c(2,2), phi=phi, d=2, thr=0.2, cnst=c(1,-1),sigma=c(1, 1))
+#' est1=uTAR.grid(y=y$series, p1=2, p2=2, d=2, thrQ=c(0,1),Trim=c(0.1,0.9),include.mean=TRUE)
 #' @export
 "uTAR.grid" <- function(y,p1,p2,d=1,thrV=NULL,thrQ=c(0,1),Trim=c(0.1,0.9),include.mean=T){
   if(is.matrix(y))y=y[,1]
@@ -2165,15 +2172,18 @@ p_cfar_part  <- function(model, f, new.obs){
   q1=c(min(tV),max(tV))
   if(thrQ[1] > 0)q1[1] <- quantile(tV,thrQ[1])
   if(thrQ[2] < 1)q1[2] <- quantile(tV,thrQ[2])
-  idx <- c(1:length(tV))[tV <= q1[1]]
-  jdx <- c(1:length(tV))[tV >= q1[2]]
+  idx <- c(1:length(tV))[tV < q1[1]]
+  jdx <- c(1:length(tV))[tV > q1[2]]
   trm <- c(idx,jdx)
-  yt <- yt[-trm]
-  if(k1 == 1){x1 <- x1[-trm]
-  }else{x1 <- x1[-trm,]}
-  if(k2 == 1){x2 <- x2[-trm]
-  }else{x2 <- x2[-trm,]}
-  tV <- tV[-trm]
+  if(length(trm)>0){
+    yt <- yt[-trm]
+    if(k1 == 1){x1 <- x1[-trm]
+    }else{x1 <- x1[-trm,]}
+    if(k2 == 1){x2 <- x2[-trm]
+    }else{
+      x2 <- x2[-trm,]}
+    tV <- tV[-trm]
+  }
   ### sorting
   DD <- sort(tV,index.return=TRUE)
   D <- DD$x
@@ -2289,16 +2299,16 @@ p_cfar_part  <- function(model, f, new.obs){
 #' It perform LS estimation of a univariate TAR model, and can handle multiple regimes.
 #' @param y time series.
 #' @param arorder AR order of each regime. The number of regime is the length of arorder.
-#' @param thr given threshould(s). There are k-1 threshold for a k-regime model.
+#' @param thr given threshold(s). There are k-1 threshold for a k-regime model.
 #' @param d delay for threshold variable, default is 1.
-#' @param thrV external threhold variable if any. If it is not NULL, thrV must have the same length as that of y.
+#' @param thrV external threshold variable if any. If it is not NULL, thrV must have the same length as that of y.
 #' @param include.mean a logical value indicating whether constant terms are included. Default is TRUE.
 #' @param output a logical value for output. Default is TRUE.
 #' @return uTAR.est returns a list with components:
 #' \item{data}{the data matrix, y.}
 #' \item{k}{the dimension of y.}
 #' \item{arorder}{AR orders of regimes 1 and 2.}
-#' \item{coefs}{a (p*k+1)-by-(2k) matrices. The first row show the estimation results in regime 1, and the second row shows these in regime 2.}
+#' \item{coefs}{a (p*k+1)-by-(2k) matrices. The first row shows the estimation results in regime 1, and the second row shows these in regime 2.}
 #' \item{sigma}{estimated innovational covariance matrices of regimes 1 and 2.}
 #' \item{thr}{threshold value.}
 #' \item{residuals}{estimated innovations.}
@@ -2308,10 +2318,10 @@ p_cfar_part  <- function(model, f, new.obs){
 #' \item{cnst}{logical values indicating whether the constant terms are included in different regimes.}
 #' \item{AIC}{AIC value.}
 #' @examples
-#' arorder=rep(1,2)
-#' ar.coef=matrix(c(0.7,-0.8),2,1)
-#' y=uTAR.sim(100,arorder,ar.coef,1,0)
-#' est=uTAR.est(y$series,arorder,0,1)
+#' phi=t(matrix(c(-0.3, 0.5,0.6,-0.3),2,2))
+#' y=uTAR.sim(nob=2000, arorder=c(2,2), phi=phi, d=2, thr=0.2, cnst=c(1,-1),sigma=c(1, 1))
+#' thr.est=uTAR.grid(y=y$series, p1=2, p2=2, d=2, thrQ=c(0,1),Trim=c(0.1,0.9))
+#' est=uTAR.est(y=y$series, arorder=c(2,2), thr=thr.est$thr, d=2)
 #' @export
 "uTAR.est" <- function(y,arorder=c(1,1),thr=c(0),d=1,thrV=NULL,include.mean=c(TRUE,TRUE),output=TRUE){
   if(is.matrix(y))y <- y[,1]
@@ -2416,11 +2426,11 @@ p_cfar_part  <- function(model, f, new.obs){
 #' \item{pred}{prediction.}
 #' \item{Ysim}{fitted y.}
 #' @examples
-#' arorder=rep(1,2)
-#' ar.coef=matrix(c(0.7,-0.8),2,1)
-#' y=uTAR.sim(100,arorder,ar.coef,1,0)
-#' est=uTAR.est(y$series,arorder,0,1)
-#' pred=uTAR.pred(est,100,1,100,0.95,TRUE)
+#' phi=t(matrix(c(-0.3, 0.5,0.6,-0.3),2,2))
+#' y=uTAR.sim(nob=2000, arorder=c(2,2), phi=phi, d=2, thr=0.2, cnst=c(1,-1),sigma=c(1, 1))
+#' thr.est=uTAR.grid(y=y$series, p1=2, p2=2, d=2, thrQ=c(0,1),Trim=c(0.1,0.9))
+#' est=uTAR.est(y=y$series, arorder=c(2,2), thr=thr.est$thr, d=2)
+#' uTAR.pred(mode=est, orig=2000,h=1,iteration=100,ci=0.95,output=TRUE)
 #' @export
 "uTAR.pred" <- function(model,orig,h=1,iterations=3000,ci=0.95,output=TRUE){
   ## ci: probability of pointwise confidence interval coefficient
@@ -2492,15 +2502,15 @@ p_cfar_part  <- function(model, f, new.obs){
   uTAR.pred <- list(data=y,pred = pred,Ysim=Ysim)
 }
 
-"NeSS" <- function(y,x1,x2=NULL,thrV=NULL,Trim=c(0.15,0.85),k0=300,include.mean=TRUE,thrQ=c(0,1),score="AIC"){
-  ### Based on Li and Tong (2016)method to narrow down the candidates for
+"NeSS" <- function(y,x1,x2=NULL,thrV=NULL,Trim=c(0.1,0.9),k0=50,include.mean=TRUE,thrQ=c(0,1),score="AIC"){
+  ### Based on method proposed by Li and Tong (2016) to narrow down the candidates for
   ### threshold value.
   ### y: dependent variable (can be multivariate)
   ### x1: the regressors that allow for coefficients to change
   ### x2: the regressors for explanatory variables
-  ### thrV: threshold variable,default is simply the time index
+  ### thrV: threshold variable. The default is simply the time index
   ### Trim: quantiles for lower and upper bound of threshold
-  ### k0: the maximum number of candidates for threhold at the output
+  ### k0: the maximum number of candidates for threshold at the output
   ### include.mean: switch for including the constant term.
   ### thrQ: lower and upper quantiles to search for threshold
   ####
@@ -2574,14 +2584,14 @@ p_cfar_part  <- function(model, f, new.obs){
         idx <- c(1:n)[thrV <= qr[i]]
         m1a <- lm(Y~-1+.,data=X,subset=idx)
         m1b <- lm(Y~-1+.,data=X,subset=-idx)
-        Jnr[i] = Jnr[i] - sum(c(m1a$residuals^2,m1b$residuals^2))
+        Jnr[i] = - sum(c(m1a$residuals^2,m1b$residuals^2))
       }
       ##     cat("in Jnr: ",Jnr,"\n")
       if(Jnr[1] >= max(Jnr[-1])){
         D <- D[D <= qr[2]]
       }
       else{ if(Jnr[2] >= max(Jnr[-2])){
-        D <- D[((qr[1] <= D) && (D <= qr[3]))]
+        D <- D[((qr[1] <= D) & (D <= qr[3]))]
       }
         else{ D <- D[D >= qr[2]]}
       }
@@ -2601,7 +2611,7 @@ p_cfar_part  <- function(model, f, new.obs){
         idx <- c(1:n)[thrV <= qr[i]]
         m1a <- MlmNeSS(y,X,subset=idx,SD=FALSE,include.mean=include.mean)
         m1b <- MlmNeSS(y,X,subset=-idx,SD=FALSE,include.mean=include.mean)
-        Jnr[i] <- Jnr[i] - sum(m1a$score[ic],m1b$score[ic])
+        Jnr[i] <- - sum(m1a$score[ic],m1b$score[ic])
       }
       if(Jnr[1] >= max(Jnr[-1])){
         D <- D[D <= qr[2]]
@@ -2628,7 +2638,7 @@ p_cfar_part  <- function(model, f, new.obs){
 #' @param sigma1 innovational covariance matrix of regime 1.
 #' @param sigma2 innovational covariance matrix of regime 2.
 #' @param c1 constant vector of regime 1.
-#' @param c2 constatn vector of regime 2.
+#' @param c2 constant vector of regime 2.
 #' @param delay two elements (i,d) with "i" being the component index and "d" the delay for threshold variable.
 #' @param ini burn-in period.
 #' @return mTAR.sim returns a list with following components:
@@ -2762,7 +2772,7 @@ p_cfar_part  <- function(model, f, new.obs){
 #' @param score the choice of criterion used in selection threshold, namely (AIC, det(RSS)).
 #' @references
 #' Li, D., and Tong. H. (2016) Nested sub-sample search algorithm for estimation of threshold models. \emph{Statisitca Sinica}, 1543-1554.
-#' @return mTAR returns a listh with the following components:
+#' @return mTAR returns a list with the following components:
 #' \item{data}{the data matrix, y.}
 #' \item{beta}{a (\code{p*k+1})-by-(\code{2k}) matrices. The first \code{k} columns show the estimation results in regime 1, and the second \code{k} columns show these in regime 2.}
 #' \item{arorder}{AR orders of regimes 1 and 2.}
@@ -2792,7 +2802,7 @@ p_cfar_part  <- function(model, f, new.obs){
 #' est=mTAR(y$series,1,1,0,y$series,delay,Trim,300,include.mean,"AIC")
 #' est2=mTAR(y$series,1,1,NULL,y$series,delay,Trim,300,include.mean,"AIC")
 #' @export
-"mTAR" <- function(y,p1,p2,thr=NULL,thrV=NULL,delay=c(1,1),Trim=c(0.15,0.85),k0=300,include.mean=TRUE,score="AIC"){
+"mTAR" <- function(y,p1,p2,thr=NULL,thrV=NULL,delay=c(1,1),Trim=c(0.1,0.9),k0=300,include.mean=TRUE,score="AIC"){
   if(!is.matrix(y))y <- as.matrix(y)
   p = max(p1,p2)
   if(p < 1)p=1
@@ -2801,10 +2811,18 @@ p_cfar_part  <- function(model, f, new.obs){
   nT <- nrow(y)
   ky <- ncol(y)
   nobe <- nT-ist+1
+  ### Built in checking
+  nT1 <- nT
+  if(!is.null(thrV))nT1 <- length(thrV)
+  if(nT != nT1){
+    cat("Input error in thrV. Reset to a SETAR model","\n")
+    thrV <- y[,delay[1]]
+  }
+  ##
   if(length(thrV) < nT){
     thrV <- y[(ist-d):(nT-d),delay[1]]
   }else{
-    thrV <- thrV[ist:nT]
+    thrV <- thrV[(ist-d):(nT-d)]
   }
   beta <- matrix(0,(p*ky+1),ky*2)
   ### set up regression framework
@@ -2840,6 +2858,7 @@ p_cfar_part  <- function(model, f, new.obs){
     RSS <- NULL
   }
   #### The above ends the search of threshold ###
+
   ### Final estimation results
   ###cat("Coefficients are in vec(beta), where t(beta)=[phi0,phi1,...]","\n")
   resi = matrix(0,nobe,ncol(yt))
@@ -2903,6 +2922,7 @@ p_cfar_part  <- function(model, f, new.obs){
   infc = m1a$information+m1b$information
   cat("Overall information criteria(aic,bic,hq): ",infc,"\n")
   Sigma <- cbind(m1a$sigma,m1b$sigma)
+
   mTAR <- list(data=y,beta=beta,arorder=c(p1,p2),sigma=Sigma,residuals = resi,nobs=c(n1,n2),
                model1 = m1a, model2 = m1b,thr=thr, delay=delay, thrV=thrV, D=D, RSS=RSS, information=infc,
                cnst=rep(include.mean,2),sresi=sresi)
@@ -2912,12 +2932,12 @@ p_cfar_part  <- function(model, f, new.obs){
 
 #' Estimation of Multivariate TAR Models
 #'
-#' Estimation of mutlivariate TAR models with given thresholds. It can handle multiple regimes.
+#' Estimation of multivariate TAR models with given thresholds. It can handle multiple regimes.
 #' @param y vector time series.
 #' @param arorder AR order of each regime. The number of regime is length of arorder.
-#' @param thr threshould value(s). There are k-1 threshold for a k-regime model.
+#' @param thr threshold value(s). There are k-1 threshold for a k-regime model.
 #' @param delay two elements (i,d) with "i" being the component and "d" the delay for threshold variable.
-#' @param thrV external threhold variable if any. If thrV is not null, it must have the same number of observations as y-series.
+#' @param thrV external threshold variable if any. If thrV is not null, it must have the same number of observations as y-series.
 #' @param include.mean logical values indicating whether constant terms are included. Default is TRUE for all.
 #' @param output a logical value indicating four output. Default is TRUE.
 #' @return mTAR.est returns a list with the following components:
@@ -2965,7 +2985,7 @@ p_cfar_part  <- function(model, f, new.obs){
     thrV <- y[(ist-d):(nT-d),delay[1]]
     if(output) cat("Estimation of a multivariate SETAR model: ","\n")
   }else{thrV <- thrV[ist:nT]}
-  ### make sure that the threholds are in increasing order!!!
+  ### make sure that the thresholds are in increasing order!!!
   thr <- sort(thr)
   k1 <- length(thr)
   ### house keeping
@@ -3390,9 +3410,9 @@ p_cfar_part  <- function(model, f, new.obs){
   MlmNeSS <- list(beta=beta,residuals=res,sigma=sig,coef=coef,information=infc,score=score)
 }
 
-#' Generate Univeraite 2-regime Markov Switching Models
+#' Generate Univariate 2-regime Markov Switching Models
 #'
-#' Generate univeraite 2-regime Markov switching models.
+#' Generate univariate 2-regime Markov switching models.
 #' @param nob number of observations.
 #' @param order AR order for each regime.
 #' @param phi1,phi2 AR coefficients.
@@ -3402,7 +3422,7 @@ p_cfar_part  <- function(model, f, new.obs){
 #' @param ini burn-in period.
 #' @return MSM.sim returns a list with components:
 #' \item{series}{a time series following SETAR model.}
-#' \item{at}{innovation of the time seres.}
+#' \item{at}{innovation of the time series.}
 #' \item{state}{states for the time series.}
 #' \item{epsilon}{transition probabilities (switching out of regime 1 and 2).}
 #' \item{sigma}{standard error for each regime.}
@@ -3473,21 +3493,20 @@ p_cfar_part  <- function(model, f, new.obs){
 #' @references
 #' Tsay, R. (1989) Testing and Modeling Threshold Autoregressive Processes. \emph{Journal of the American Statistical Associations} \strong{84}(405), 231-240.
 #'
-#' @param y a time seris.
+#' @param y a time series.
 #' @param p AR order.
-#' @param d delay for the threhosld variable.
+#' @param d delay for the threshold variable.
 #' @param thrV threshold variable.
-#' @param ini inital number of data to start RLS estimation.
+#' @param ini initial number of data to start RLS estimation.
 #' @param include.mean a logical value for including constant terms.
 #' @return \code{thr.test} returns a list with components:
 #' \item{F-ratio}{F statistic.}
 #' \item{df}{the numerator and denominator degrees of freedom.}
 #' \item{ini}{initial number of data to start RLS estimation.}
 #' @examples
-#' arorder=rep(1,2)
-#' ar.coef=matrix(c(0.7,-0.8),2,1)
-#' y=uTAR.sim(100,arorder,ar.coef,1,0)
-#' thr.test(y$series,1,1,y$series,40,TRUE)
+#' phi=t(matrix(c(-0.3, 0.5,0.6,-0.3),2,2))
+#' y=uTAR.sim(nob=2000, arorder=c(2,2), phi=phi, d=2, thr=0.2, cnst=c(1,-1),sigma=c(1, 1))
+#' thr.test(y$series,p=2,d=2,ini=40,include.mean=TRUE)
 #' @export
 "thr.test" <- function(y,p=1,d=1,thrV=NULL,ini=40,include.mean=T){
   if(is.matrix(y))y <- y[,1]
@@ -3581,10 +3600,11 @@ p_cfar_part  <- function(model, f, new.obs){
 #' Tsay, R. (1986) Nonlinearity tests for time series. \emph{Biometrika} \strong{73}(2), 461-466.
 #' @param y time series.
 #' @param p AR order.
-#' @return The function outputs the F statistic, p value, and the degrees of freedom. The null hypothsis is there is no nonlinearity.
+#' @return The function outputs the F statistic, p value, and the degrees of freedom. The null hypothesis is there is no nonlinearity.
 #' @examples
-#' y=MSM.sim(100,c(1,1),0.7,-0.5,c(0.5,0.6),c(1,1),c(0,0),500)
-#' Tsay(y$series,1)
+#' phi=t(matrix(c(-0.3, 0.5,0.6,-0.3),2,2))
+#' y=uTAR.sim(nob=2000, arorder=c(2,2), phi=phi, d=2, thr=0.2, cnst=c(1,-1),sigma=c(1, 1))
+#' Tsay(y$series,2)
 #' @export
 "Tsay" <- function(y,p=1){
   if(is.matrix(y))y=y[,1]
@@ -3635,14 +3655,14 @@ p_cfar_part  <- function(model, f, new.obs){
 #' @param orig forecast origin.
 #' @param h forecast horizon.
 #' @param xre the independent variables.
-#' @param fixed parameter constriant.
-#' @param include.mean a logicial value for constant term of the model. Default is TRUE.
+#' @param fixed parameter constraint.
+#' @param include.mean a logical value for constant term of the model. Default is TRUE.
 #' @return The function returns a list with following components:
 #' \item{orig}{the starting forecast origin.}
 #' \item{err}{observed value minus fitted value.}
 #' \item{rmse}{RMSE of out-of-sample forecasts.}
 #' \item{mabso}{mean absolute error of out-of-sample forecasts.}
-#' \item{bias}{bias of out-of-sample foecasts.}
+#' \item{bias}{bias of out-of-sample forecasts.}
 #' @examples
 #' data=arima.sim(n=100,list(ar=c(0.5,0.3)))
 #' model=arima(data,order=c(2,0,0))
@@ -3654,7 +3674,7 @@ p_cfar_part  <- function(model, f, new.obs){
   # rt: the time series
   # xre: the independent variables
   # h: forecast horizon
-  # fixed: parameter constriant
+  # fixed: parameter constraint
   # inc.mean: flag for constant term of the model.
   #
   regor=c(m1$arma[1],m1$arma[6],m1$arma[2])
@@ -3678,7 +3698,7 @@ p_cfar_part  <- function(model, f, new.obs){
     else {nx=matrix(xre[(n+1):(n+h),],h,ncol(xre))}
     fore=predict(mm,h,newxreg=nx)
     kk=min(nT,(n+h))
-    # nof is the effective number of forecats at the forecast origin n.
+    # nof is the effective number of forecasts at the forecast origin n.
     nof=kk-n
     pred=fore$pred[1:nof]
     obsd=rt[(n+1):kk]
@@ -3696,7 +3716,7 @@ p_cfar_part  <- function(model, f, new.obs){
   print(rmse)
   print("Mean absolute error of out-of-sample forecasts")
   print(mabso)
-  print("Bias of out-of-sample foecasts")
+  print("Bias of out-of-sample forecasts")
   print(bias)
   backtest <- list(origin=orig,error=err,rmse=rmse,mabso=mabso,bias=bias)
 }
@@ -3710,12 +3730,6 @@ p_cfar_part  <- function(model, f, new.obs){
 #' @param orig forecast origin.
 #' @param h forecast horizon.
 #' @param iter number of iterations.
-#' @examples
-#' arorder=rep(1,2)
-#' ar.coef=matrix(c(0.7,-0.8),2,1)
-#' y=uTAR.sim(100,arorder,ar.coef,1,0)
-#' est=uTAR.est(y$series,arorder,0,1)
-#' backTAR(est,50,1,3000)
 #' @return \code{backTAR} returns a list of components:
 #' \item{model}{SETAR model.}
 #' \item{error}{prediction errors.}
@@ -3813,8 +3827,9 @@ p_cfar_part  <- function(model, f, new.obs){
 #' \item{Qstat}{test statistics.}
 #' \item{pv}{p-values.}
 #' @examples
-#' y=rnorm(1000)
-#' rankQ(y,10,output=TRUE)
+#' phi=t(matrix(c(-0.3, 0.5,0.6,-0.3),2,2))
+#' y=uTAR.sim(nob=2000, arorder=c(2,2), phi=phi, d=2, thr=0.2, cnst=c(1,-1),sigma=c(1, 1))
+#' rankQ(y$series,10,output=TRUE)
 #' @export
 "rankQ" <- function(zt,lag=10,output=TRUE){
   nT <- length(zt)
@@ -4258,14 +4273,14 @@ p_cfar_part  <- function(model, f, new.obs){
 #' @param mm the Monte Carlo sample size.
 #' @param par a list of parameter values to pass to \code{Sstep}.
 #' @param xx.init the initial samples of \code{x_0}.
-#' @param xdim the dimension of the state varible \code{x_t}.
+#' @param xdim the dimension of the state variable \code{x_t}.
 #' @param ydim the dimension of the observation \code{y_t}.
 #' @param resample.sch a binary vector of length \code{nobs}, reflecting the resampling schedule. resample.sch[i]= 1 indicating resample should be carried out at step \code{i}.
 #' @param delay the maximum delay lag for delayed weighting estimation. Default is zero.
 #' @param funH a user supplied function \code{h()} for estimation \code{E(h(x_t) | y_t+d}). Default
 #' is identity for estimating the mean. The function should be able to take vector or matrix as input and operates on each element of the input.
 #' @references
-#' Tsay, R. and Chen, R. (2019). Nonlinear Time Series Analysis. Wiley, New Jersey.
+#' Tsay, R. and Chen, R. (2018). Nonlinear Time Series Analysis. John Wiley & Sons, New Jersey.
 #' @return The function returns \code{xhat}, an array with dimensions \code{(xdim; nobs; delay+1)},
 #' and the scaled log-likelihood value \code{loglike}. If \code{loglike} is needed, the log weight
 #' calculation in the \code{Sstep} function should retain all constants that are related to
@@ -4290,9 +4305,6 @@ p_cfar_part  <- function(model, f, new.obs){
 SMC=function(Sstep,nobs,yy,mm,par,xx.init,xdim,ydim,
              resample.sch,delay=0,funH=identity){
   #---------------------------------------------------------------
-  #print(c('aa',nobs));flush.console()
-  #print(par);flush.console()
-  #print(c('aa',ydim,mm,delay));flush.console()
   xxd <- array(dim=c(xdim,mm,delay+1))
   delay.front = 1
   loglike=0
@@ -4302,8 +4314,6 @@ SMC=function(Sstep,nobs,yy,mm,par,xx.init,xdim,ydim,
   xhat <- array(dim=c(xdim,nobs,delay+1))
   logww <- rep(0,mm)
   for(i in 1:nobs){
-    #print(i);flush.console();
-    #print(c('why',par));flush.console();
     if(ydim==1){
       yyy <- yy[i]
     }else{
@@ -4312,29 +4322,21 @@ SMC=function(Sstep,nobs,yy,mm,par,xx.init,xdim,ydim,
     step <- Sstep(mm,xx,logww,yyy,par,xdim,ydim)
     xx <- step$xx
     logww <- step$logww-max(step$logww)
-    loglike=loglike+max(step$logww)
+    loglike <- loglike+max(step$logww)
     ww <- exp(logww)
-    sumww=sum(ww)
+    sumww <- sum(ww)
     ww <- ww/sumww
     xxd[,,delay.front] <- funH(xx)
     delay.front <- delay.front%%(delay+1) + 1
     order <- circular2ordinal(delay.front, delay+1)
-    #if(xdim==1){
-    #   xhat.tmp <- ww%*%xxd[1,,]
-    #   xhat[,i,] <- xhat.tmp[order]
-    # }
-    #else{
-    #   for(id in 1:(delay+1)){
-    #    xhat[,i,id] <- xxd[,,order[id]]%*%ww
-    #   }
-    #}
+    if(xdim==1) ww=as.vector(ww)  ## correction: insert
     xhat[,i,] <- tensor(xxd,ww,2,1)[,order]
     if(resample.sch[i]==1){
       r.index <- sample.int(mm,size=mm,replace=T,prob=ww)
       xx[,] <- xx[,r.index]
       xxd[,,] <- xxd[,r.index,]
       logww <- logww*0
-      loglike=loglike+log(sumww)
+      loglike <- loglike+log(sumww)
     }
   }
   if(resample.sch[nobs]==0){
@@ -4350,7 +4352,6 @@ SMC=function(Sstep,nobs,yy,mm,par,xx.init,xdim,ydim,
   }
   return(list(xhat=xhat,loglike=loglike))
 }
-
 
 
 ar2natural=function(par.ar){
@@ -4397,15 +4398,16 @@ Sstep.SV=function(mm,xx,logww,yyy,par,xdim,ydim){
 #' @param mm the Monte Carlo sample size \code{m}.
 #' @param par a list of parameter values.
 #' @param xx.init the initial samples of \code{x_0}.
-#' @param xdim the dimension of the state varible \code{x_t}.
+#' @param xdim the dimension of the state variable \code{x_t}.
 #' @param ydim the dimension of the observation \code{y_t}.
 #' @param resample.sch a binary vector of length \code{nobs}, reflecting the resampling schedule. resample.sch[i]= 1 indicating resample should be carried out at step \code{i}.
-#' @param funH a user supplied function \code{h()} for estimation \code{E(h(x_t) | y_t+d}). Default
+#' @param funH a user supplied function \code{h()} for estimation \code{E(h(x_t) | y_1,...,y_T}). Default
 #' is identity for estimating the mean. The function should be able to take vector or matrix as input and operates on each element of the input.
 #' @references
-#' Tsay, R. and Chen, R. (2019). Nonlinear Time Series Analysis. Wiley, New Jersey.
+#' Tsay, R. and Chen, R. (2018). Nonlinear Time Series Analysis. John Wiley & Sons, New Jersey.
 #' @return The function returns the smoothed values.
 #' @export
+
 SMC.Smooth=function(SISstep,SISstep.Smooth,nobs,yy,mm,par,
                     xx.init,xdim,ydim,resample.sch,funH=identity){
   #---------------------------------------------------------------
@@ -4413,6 +4415,7 @@ SMC.Smooth=function(SISstep,SISstep.Smooth,nobs,yy,mm,par,
   wwall <- matrix(nrow=mm,ncol=nobs)
   xhat <- matrix(nrow=xdim,ncol=nobs)
   xx <- xx.init
+  if(xdim==1) xx=matrix(xx,nrow=1,ncol=mm)  ## correction: insert
   logww <- rep(0,mm)
   for(i in 1:nobs){
     # print(c('forward',i));flush.console();
@@ -4464,7 +4467,7 @@ SMC.Smooth=function(SISstep,SISstep.Smooth,nobs,yy,mm,par,
 #' @param nyy the dimension of the data.
 #' @param yrange the range of data.
 #' @references
-#' Tsay, R. and Chen, R. (2019). Nonlinear Time Series Analysis. Wiley, New Jersey.
+#' Tsay, R. and Chen, R. (2018). Nonlinear Time Series Analysis. John Wiley & Sons, New Jersey.
 #' @return The function returns a list with components:
 #' \item{xx}{the location.}
 #' \item{ss}{the speed.}
@@ -4509,7 +4512,7 @@ simuTargetClutter=function(nobs,pd,ssw,ssv,xx0,ss0,nyy,yrange){
 #' @param xdim the dimension of the state varible.
 #' @param ydim the dimension of the observation.
 #' @references
-#' Tsay, R. and Chen, R. (2019). Nonlinear Time Series Analysis. Wiley, New Jersey.
+#' Tsay, R. and Chen, R. (2018). Nonlinear Time Series Analysis. John Wiley & Sons, New Jersey.
 #' @return The function returns a list with the following components:
 #' \item{xx}{the new sample.}
 #' \item{logww}{the log weights.}
@@ -4543,14 +4546,14 @@ Sstep.Clutter=function(mm,xx,logww,yyy,par,xdim,ydim){
 
 #' Kalman Filter for Tracking in Clutter
 #'
-#' This function implments Kalman filter to track a moving target under clutter environment with known indicators.
+#' This function implements Kalman filter to track a moving target under clutter environment with known indicators.
 #' @param nobs the number of observations.
 #' @param ssw the standard deviation in the state equation.
 #' @param ssv the standard deviation for the observation noise.
 #' @param yy the data.
 #' @param ii the indicators.
 #' @references
-#' Tsay, R. and Chen, R. (2019). Nonlinear Time Series Analysis. Wiley, New Jersey.
+#' Tsay, R. and Chen, R. (2018). Nonlinear Time Series Analysis. John Wiley & Sons, New Jersey.
 #' @return The function returns a list with the following components:
 #' \item{xhat}{the fitted location.}
 #' \item{shat}{the fitted speed.}
@@ -4601,7 +4604,7 @@ KF1pred=function(mu,SS,HH,bb,WW){
 #' and (20,0).
 #' @param nn sample size.
 #' @param q contains the information about the covariance of the noise.
-#' @param r contains the information about \code{V}, where \code{V*t(V)} is the ocvariance of the observation noise.
+#' @param r contains the information about \code{V}, where \code{V*t(V)} is the covariance matrix of the observation noise.
 #' @param start the initial value.
 #' @param seed the seed of random number generator.
 #' @return The function returns a list with components:
@@ -4675,12 +4678,12 @@ simPassiveSonar=function(nn=200,q,r,start,seed){
 #' @param ydim the dimension of the observation \code{y_t}.
 #' @param resample.sch a binary vector of length \code{nobs}, reflecting the resampling schedule. resample.sch[i]= 1 indicating resample should be carried out at step \code{i}.
 #' @references
-#' Tsay, R. and Chen, R. (2019). Nonlinear Time Series Analysis. Wiley, New Jersey.
+#' Tsay, R. and Chen, R. (2018). Nonlinear Time Series Analysis. John Wiley & Sons, New Jersey.
 #' @return The function returns a list with components:
 #' \item{xhat}{the fitted value.}
 #' \item{xhatRB}{the fitted value using Rao-Blackwellization.}
 #' \item{Iphat}{the estimated indicators.}
-#' \item{IphatRB}{the esitmated indicators using Rao-Blackwellization.}
+#' \item{IphatRB}{the estimated indicators using Rao-Blackwellization.}
 #' @export
 MKF.Full.RB=function(MKFstep.Full.RB,nobs,yy,mm,par,II.init,
                      mu.init,SS.init,xdim,ydim,resample.sch){
@@ -4740,16 +4743,16 @@ KFoneLike=function(mu,SS,yy,HH,GG,WW,VV){
 #' @param yyy the observations with \code{T} columns and \code{ydim} rows.
 #' @param par a list of parameter values. \code{HH} is the state coefficient matrix, \code{WW*t(WW)} is the state innovation covariance matrix,
 #' \code{VV*t(VV)} is the covariance matrix of the observation noise, \code{GG1} and \code{GG2} are the observation coefficient matrix.
-#' @param xdim the dimension of the state varible \code{x_t}.
+#' @param xdim the dimension of the state variable \code{x_t}.
 #' @param ydim the dimension of the observation \code{y_t}.
 #' @param resample a binary vector of length \code{obs}, reflecting the resampling schedule. resample.sch[i]= 1 indicating resample should be carried out at step \code{i}.
 #' @references
-#' Tsay, R. and Chen, R. (2019). Nonlinear Time Series Analysis. Wiley, New Jersey.
+#' Tsay, R. and Chen, R. (2018). Nonlinear Time Series Analysis. John Wiley & Sons, New Jersey.
 #' @return The function returns a list with components:
 #' \item{xhat}{the fitted value.}
 #' \item{xhatRB}{the fitted value using Rao-Blackwellization.}
 #' \item{Iphat}{the estimated indicators.}
-#' \item{IphatRB}{the esitmated indicators using Rao-Blackwellization.}
+#' \item{IphatRB}{the estimated indicators using Rao-Blackwellization.}
 #' @export
 MKFstep.fading=function(mm,II,mu,SS,logww,yyy,par,xdim,ydim,resample){
   HH <- par$HH; WW <- par$WW;
@@ -4814,10 +4817,10 @@ KF1update=function(mu,SS,yy,GG,cc,VV){
 #' @param yy the observations with \code{T} columns and \code{ydim} rows.
 #' @param par a list of parameter values. \code{H} is the state coefficient matrix, \code{W*t(W)} is the state innovation covariance matrix,
 #' \code{V*t(V)} is the covariance matrix of the observation noise, \code{s2} is the second sonar location.
-#' @param xdim the dimension of the state varible \code{x_t}.
+#' @param xdim the dimension of the state variable \code{x_t}.
 #' @param ydim the dimension of the observation \code{y_t}.
 #' @references
-#' Tsay, R. and Chen, R. (2019). Nonlinear Time Series Analysis. Wiley, New Jersey.
+#' Tsay, R. and Chen, R. (2018). Nonlinear Time Series Analysis. John Wiley & Sons, New Jersey.
 #' @return The function returns a list with the following components:
 #' \item{xx}{the new sample.}
 #' \item{logww}{the log weights.}
@@ -4840,11 +4843,11 @@ Sstep.Sonar=function(mm,xx,logww,yy,par,xdim=1,ydim=1){
 #' @param mm the Monte Carlo sample size \code{m}.
 #' @param xxt the sample in the last iteration.
 #' @param xxt1 the sample in the next iteration.
-#' @param ww  \code{ww*t(ww)} is the state innovation covariance matrix.
-#' @param vv \code{vv*t(vv)} is the covariance matrix of the observation noise.
+#' @param ww  the forward filtering weight.
+#' @param vv the backward smoothing weight.
 #' @param par a list of parameter values. \code{H} is the state coefficient matrix, and \code{W*t(W)} is the state innovation covariance matrix.
 #' @references
-#' Tsay, R. and Chen, R. (2019). Nonlinear Time Series Analysis. Wiley, New Jersey.
+#' Tsay, R. and Chen, R. (2018). Nonlinear Time Series Analysis. John Wiley & Sons, New Jersey.
 #' @return The function returns a list with the following components:
 #' \item{xx}{the new sample.}
 #' \item{logww}{the log weights.}
@@ -4880,10 +4883,10 @@ Sstep.Smooth.Sonar=function(mm,xxt,xxt1,ww,vv,par){
 #' @param yyy the observations with \code{T} columns and \code{ydim} rows.
 #' @param par a list of parameter values.  \code{HH} is the state coefficient model, \code{WW*t(WW)} is the state innovation covariance matrix,
 #' \code{VV*t(VV)} is the covariance of the observation noise, \code{GG} is the observation model.
-#' @param xdim2 the dimension of the state varible \code{x_t}.
+#' @param xdim2 the dimension of the state variable \code{x_t}.
 #' @param ydim the dimension of the observation \code{y_t}.
 #' @references
-#' Tsay, R. and Chen, R. (2019). Nonlinear Time Series Analysis. Wiley, New Jersey.
+#' Tsay, R. and Chen, R. (2018). Nonlinear Time Series Analysis. John Wiley & Sons, New Jersey.
 #' @return The function returns a list with the following components:
 #' \item{xx}{the new sample.}
 #' \item{logww}{the log weights.}
@@ -4994,7 +4997,7 @@ simu_fading=function(nobs,par){
 
 #' Sequential Importance Sampling under Clutter Environment
 #'
-#' This function performs one step propagation using the sequential importantce sampling with full information proposal distribuiton under clutter environment.
+#' This function performs one step propagation using the sequential importance sampling with full information proposal distribution under clutter environment.
 #' @param mm the Monte Carlo sample size \code{m}.
 #' @param xx the samples in the last iteration.
 #' @param logww the log weight in the last iteration.
@@ -5002,11 +5005,11 @@ simu_fading=function(nobs,par){
 #' @param par a list of parameter values \code{(ssw,ssv,pd,nyy,yr)}, where \code{ssw} is the standard deviation in the state equation,
 #' \code{ssv} is the standard deviation for the observation noise, \code{pd} is the probability to observe the true signal, \code{nyy} the dimension of the data,
 #' and \code{yr} is the range of the data.
-#' @param xdim the dimension of the state varible \code{x_t}.
+#' @param xdim the dimension of the state variable \code{x_t}.
 #' @param ydim the dimension of the observation \code{y_t}.
 #' @param resample.sch a binary vector of length \code{obs}, reflecting the resampling schedule. resample.sch[i]= 1 indicating resample should be carried out at step \code{i}.
 #' @references
-#' Tsay, R. and Chen, R. (2019). Nonlinear Time Series Analysis. Wiley, New Jersey.
+#' Tsay, R. and Chen, R. (2018). Nonlinear Time Series Analysis. John Wiley & Sons, New Jersey.
 #' @return The function returns a list with the following components:
 #' \item{xx}{the new sample.}
 #' \item{logww}{the log weights.}
@@ -5078,7 +5081,7 @@ Sstep.Clutter.Full=function(mm,xx,logww,yyy,par,xdim,ydim,resample.sch){
 #' @param funH a user supplied function \code{h()} for estimation \code{E(h(x_t) | y_t+d}). Default
 #' is identity for estimating the mean. The function should be able to take vector or matrix as input and operates on each element of the input.
 #' @references
-#' Tsay, R. and Chen, R. (2019). Nonlinear Time Series Analysis. Wiley, New Jersey.
+#' Tsay, R. and Chen, R. (2018). Nonlinear Time Series Analysis. John Wiley & Sons, New Jersey.
 #' @return The function returns a list with the following components:
 #' \item{xhat}{the fitted values.}
 #' \item{loglike}{the log-likelihood.}
@@ -5114,6 +5117,7 @@ SMC.Full=function(SISstep.Full,nobs,yy,mm,par,xx.init,xdim,ydim,
     order <- circular2ordinal(delay.front, delay+1)
     ww <- exp(logww)
     ww <- ww/sum(ww)
+    if(xdim==1) ww=as.vector(ww)  # correction: insert
     xhat[,i,] <- tensor(xxd,ww,2,1)[,order]
   }
   if(delay > 0){
@@ -5124,8 +5128,6 @@ SMC.Full=function(SISstep.Full,nobs,yy,mm,par,xx.init,xdim,ydim,
   }
   return(list(xhat=xhat,loglike=loglike))
 }
-
-
 
 #' Generic Sequential Monte Carlo Using Full Information Proposal Distribution and Rao-Blackwellization
 #'
@@ -5144,15 +5146,17 @@ SMC.Full=function(SISstep.Full,nobs,yy,mm,par,xx.init,xdim,ydim,
 #' @param ydim the dimension of the observation \code{y_t}.
 #' @param resample.sch a binary vector of length \code{nobs}, reflecting the resampling schedule. resample.sch[i]= 1 indicating resample should be carried out at step \code{i}.
 #' @references
-#' Tsay, R. and Chen, R. (2019). Nonlinear Time Series Analysis. Wiley, New Jersey.
+#' Tsay, R. and Chen, R. (2018). Nonlinear Time Series Analysis. John Wiley & Sons, New Jersey.
 #' @return The function returns a list with the following components:
 #' \item{xhat}{the fitted values.}
 #' \item{xhatRB}{the fitted values using Rao-Blackwellization.}
 #' @export
+
 SMC.Full.RB=function(SISstep.Full.RB,nobs,yy,mm,par,xx.init,xdim,ydim,
                      resample.sch){
   #---------------------------------------------------------------
   xx <- xx.init
+  if(xdim==1) xx=matrix(xx,nrow=1,ncol=mm)  ## correction: insert
   xhat <- matrix(nrow=xdim,ncol=nobs)
   xhatRB <- matrix(nrow=xdim,ncol=nobs)
   logww <- rep(0,mm)
@@ -5173,10 +5177,9 @@ SMC.Full.RB=function(SISstep.Full.RB,nobs,yy,mm,par,xx.init,xdim,ydim,
 
 
 
-
 #' Sequential Importance Sampling under Clutter Environment
 #'
-#' This function performs one step propagation using the sequential importantce sampling with full information proposal distribuiton and returns Rao-Blackwellization estimate of mean under clutter environment.
+#' This function performs one step propagation using the sequential importance sampling with full information proposal distribution and returns Rao-Blackwellization estimate of mean under clutter environment.
 #' @param mm the Monte Carlo sample size \code{m}.
 #' @param xx the samples in the last iteration.
 #' @param logww the log weight in the last iteration.
@@ -5184,11 +5187,11 @@ SMC.Full.RB=function(SISstep.Full.RB,nobs,yy,mm,par,xx.init,xdim,ydim,
 #' @param par a list of parameter values \code{(ssw,ssv,pd,nyy,yr)}, where \code{ssw} is the standard deviation in the state equation,
 #' \code{ssv} is the standard deviation for the observation noise, \code{pd} is the probability to observe the true signal, \code{nyy} the dimension of the data,
 #' and \code{yr} is the range of the data.
-#' @param xdim the dimension of the state varible \code{x_t}.
+#' @param xdim the dimension of the state variable \code{x_t}.
 #' @param ydim the dimension of the observation \code{y_t}.
 #' @param resample.sch a binary vector of length \code{obs}, reflecting the resampling schedule. resample.sch[i]= 1 indicating resample should be carried out at step \code{i}.
 #' @references
-#' Tsay, R. and Chen, R. (2019). Nonlinear Time Series Analysis. Wiley, New Jersey.
+#' Tsay, R. and Chen, R. (2018). Nonlinear Time Series Analysis. John Wiley & Sons, New Jersey.
 #' @return The function returns a list with the following components:
 #' \item{xx}{the new sample.}
 #' \item{logww}{the log weights.}
@@ -5257,7 +5260,7 @@ Sstep.Clutter.Full.RB=function(mm,xx,logww,yyy,par,xdim,ydim,
 #' @param setseed the seed number.
 #' @param resample the logical value indicating for resampling.
 #' @references
-#' Tsay, R. and Chen, R. (2019). Nonlinear Time Series Analysis. Wiley, New Jersey.
+#' Tsay, R. and Chen, R. (2018). Nonlinear Time Series Analysis. John Wiley & Sons, New Jersey.
 #' @return The function returns the log-likelihood of the data.
 #' @export
 wrap.SMC=function(par.natural,yy, mm, setseed=T,resample=T){
@@ -5287,7 +5290,7 @@ wrap.SMC=function(par.natural,yy, mm, setseed=T,resample=T){
 #' @param lags a vector containing the lagged variables used to form the x-matrix.
 #' @param include.lagY indicator for including lagged \code{Y(t)} in the predictor matrix.
 #' @references
-#' Tsay, R. and Chen, R. (2019). Nonlinear Time Series Analysis. Wiley, New Jersey.
+#' Tsay, R. and Chen, R. (2018). Nonlinear Time Series Analysis. John Wiley & Sons, New Jersey.
 #' @return The function returns a list with following components.
 #' \item{X}{\code{x}-matrix for training a neural network.}
 #' \item{y}{\code{y}-output for training a neural network.}
@@ -5338,7 +5341,7 @@ wrap.SMC=function(par.natural,yy, mm, setseed=T,resample=T){
 #' @param subsize sample size of subsampling.
 #' @param iter number of iterations.
 #' @references
-#' Tsay, R. and Chen, R. (2019). Nonlinear Time Series Analysis. Wiley, New Jersey.
+#' Tsay, R. and Chen, R. (2018). Nonlinear Time Series Analysis. John Wiley & Sons, New Jersey.
 #' @return The function returns a list with following components.
 #' \item{rmse}{root mean squares of forecast errors for all iterations.}
 #' \item{mae}{mean absolute forecast errors for all iterations.}

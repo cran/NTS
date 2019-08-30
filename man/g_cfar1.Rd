@@ -5,7 +5,7 @@
 \title{Generate a CFAR(1) Process}
 \usage{
 g_cfar1(tmax = 1001, rho = 5, phi_func = NULL, grid = 1000,
-  sigma = 1)
+  sigma = 1, ini = 100)
 }
 \arguments{
 \item{tmax}{length of time.}
@@ -14,9 +14,11 @@ g_cfar1(tmax = 1001, rho = 5, phi_func = NULL, grid = 1000,
 
 \item{phi_func}{convolutional function. Default is density function of normal distribution with mean 0 and standard deviation 0.1.}
 
-\item{grid}{the number of grid points used to constrcut the functional time series. Default is 1000.}
+\item{grid}{the number of grid points used to construct the functional time series. Default is 1000.}
 
 \item{sigma}{the standard deviation of O-U process. Default is 1.}
+
+\item{ini}{the burn-in period.}
 }
 \value{
 The function returns a list with components:
@@ -31,7 +33,7 @@ phi_func= function(x)
 {
  	return(dnorm(x,mean=0,sd=0.1))
 }
-y=g_cfar1(1000,5,phi_func)
+y=g_cfar1(1000,5,phi_func,grid=1000,sigma=1,ini=100)
 }
 \references{
 Liu, X., Xiao, H., and Chen, R. (2016) Convolutional autoregressive models for functional time series. \emph{Journal of Econometrics}, 194, 263-282.

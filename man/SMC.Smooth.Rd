@@ -26,13 +26,13 @@ observation at current time step. It should return {xx} (the samples xt) and
 
 \item{xx.init}{the initial samples of \code{x_0}.}
 
-\item{xdim}{the dimension of the state varible \code{x_t}.}
+\item{xdim}{the dimension of the state variable \code{x_t}.}
 
 \item{ydim}{the dimension of the observation \code{y_t}.}
 
 \item{resample.sch}{a binary vector of length \code{nobs}, reflecting the resampling schedule. resample.sch[i]= 1 indicating resample should be carried out at step \code{i}.}
 
-\item{funH}{a user supplied function \code{h()} for estimation \code{E(h(x_t) | y_t+d}). Default
+\item{funH}{a user supplied function \code{h()} for estimation \code{E(h(x_t) | y_1,...,y_T}). Default
 is identity for estimating the mean. The function should be able to take vector or matrix as input and operates on each element of the input.}
 }
 \value{
@@ -42,5 +42,5 @@ The function returns the smoothed values.
 Generic sequential Monte Carlo smoothing with marginal weights.
 }
 \references{
-Tsay, R. and Chen, R. (2019). Nonlinear Time Series Analysis. Wiley, New Jersey.
+Tsay, R. and Chen, R. (2018). Nonlinear Time Series Analysis. John Wiley & Sons, New Jersey.
 }

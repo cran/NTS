@@ -2,7 +2,7 @@
 % Please edit documentation in R/hello.R
 \name{MSM.sim}
 \alias{MSM.sim}
-\title{Generate Univeraite 2-regime Markov Switching Models}
+\title{Generate Univariate 2-regime Markov Switching Models}
 \usage{
 MSM.sim(nob, order = c(1, 1), phi1 = NULL, phi2 = NULL,
   epsilon = c(0.1, 0.1), sigma = c(1, 1), cnst = c(0, 0),
@@ -26,7 +26,7 @@ MSM.sim(nob, order = c(1, 1), phi1 = NULL, phi2 = NULL,
 \value{
 MSM.sim returns a list with components:
 \item{series}{a time series following SETAR model.}
-\item{at}{innovation of the time seres.}
+\item{at}{innovation of the time series.}
 \item{state}{states for the time series.}
 \item{epsilon}{transition probabilities (switching out of regime 1 and 2).}
 \item{sigma}{standard error for each regime.}
@@ -35,7 +35,7 @@ MSM.sim returns a list with components:
 \item{phi1, phi2}{the AR coefficients for two regimes.}
 }
 \description{
-Generate univeraite 2-regime Markov switching models.
+Generate univariate 2-regime Markov switching models.
 }
 \examples{
 y=MSM.sim(100,c(1,1),0.7,-0.5,c(0.5,0.6),c(1,1),c(0,0),500)

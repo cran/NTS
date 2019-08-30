@@ -13,12 +13,12 @@ est_cfar(f, p = 3, df_b = 10, grid = 1000)
 
 \item{df_b}{the degrees of freedom for natural cubic splines. Default is 10.}
 
-\item{grid}{the number of gird points used to constrct the functional time series and noise process. Default is 1000.}
+\item{grid}{the number of gird points used to construct the functional time series and noise process. Default is 1000.}
 }
 \value{
 The function returns a list with components:
-\item{phi_coef}{estimated spline coefficients for convluaional function(s).}
-\item{phi_func}{estimated convoluational function(s).}
+\item{phi_coef}{estimated spline coefficients for convolutional function values, a (2*grid+1)-by-p matrix.}
+\item{phi_func}{estimated convolutional function(s), a (df_b+1)-by-p matrix.}
 \item{rho}{estimated rho for O-U process (noise process).}
 \item{sigma}{estimated sigma for O-U process (noise process).}
 }

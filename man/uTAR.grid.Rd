@@ -12,7 +12,7 @@ uTAR.grid(y, p1, p2, d = 1, thrV = NULL, thrQ = c(0, 1),
 
 \item{p1, p2}{AR-orders of regime 1 and regime 2.}
 
-\item{d}{delay for threshold variable, default is 1.}
+\item{d}{delay for threshold variable, default is 1. (Apply to the external threshold variable too.)}
 
 \item{thrV}{threshold variable. if it is not null, thrV must have the same length as that of y.}
 
@@ -27,7 +27,7 @@ uTAR.grid returns a list with components:
 \item{data}{the data matrix, y.}
 \item{arorder}{AR orders of regimes 1 and 2.}
 \item{residuals}{estimated innovations.}
-\item{coefs}{a 2-by-(p+1) matrices. The first row show the estimation results in regime 1, and the second row shows these in regime 2.}
+\item{coefs}{a 2-by-(p+1) matrices. The first row shows the estimation results in regime 1, and the second row shows these in regime 2.}
 \item{sigma}{estimated innovational covariance matrices of regimes 1 and 2.}
 \item{nobs}{numbers of observations in regimes 1 and 2.}
 \item{delay}{the delay for threshold variable.}
@@ -46,11 +46,7 @@ The program uses a grid to search for threshold value.
 It is a conservative approach, but might be more reliable than the Li and Tong (2016) procedure.
 }
 \examples{
-arorder=rep(1,2)
-ar.coef=matrix(c(0.7,-0.8),2,1)
-y=uTAR.sim(100,arorder,ar.coef,1,0)
-uTAR.grid(y$series,1,1,1,y$series,c(0,1),c(0.2,0.8),TRUE)
-}
-\references{
-Li, D., and Tong. H. (2016) Nested sub-sample search algorithm for estimation of threshold models. \emph{Statisitca Sinica}, 1543-1554.
+phi=t(matrix(c(-0.3, 0.5,0.6,-0.3),2,2))
+y=uTAR.sim(nob=2000, arorder=c(2,2), phi=phi, d=2, thr=0.2, cnst=c(1,-1),sigma=c(1, 1))
+est1=uTAR.grid(y=y$series, p1=2, p2=2, d=2, thrQ=c(0,1),Trim=c(0.1,0.9),include.mean=TRUE)
 }

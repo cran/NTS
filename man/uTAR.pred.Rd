@@ -30,9 +30,9 @@ uTAR.pred returns a list with components:
 Prediction of a fitted univariate TAR model.
 }
 \examples{
-arorder=rep(1,2)
-ar.coef=matrix(c(0.7,-0.8),2,1)
-y=uTAR.sim(100,arorder,ar.coef,1,0)
-est=uTAR.est(y$series,arorder,0,1)
-pred=uTAR.pred(est,100,1,100,0.95,TRUE)
+phi=t(matrix(c(-0.3, 0.5,0.6,-0.3),2,2))
+y=uTAR.sim(nob=2000, arorder=c(2,2), phi=phi, d=2, thr=0.2, cnst=c(1,-1),sigma=c(1, 1))
+thr.est=uTAR.grid(y=y$series, p1=2, p2=2, d=2, thrQ=c(0,1),Trim=c(0.1,0.9))
+est=uTAR.est(y=y$series, arorder=c(2,2), thr=thr.est$thr, d=2)
+uTAR.pred(mode=est, orig=2000,h=1,iteration=100,ci=0.95,output=TRUE)
 }

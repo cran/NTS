@@ -22,7 +22,7 @@ mTAR.sim(nob, thr, phi1, phi2, sigma1, sigma2 = NULL, c1 = NULL,
 
 \item{c1}{constant vector of regime 1.}
 
-\item{c2}{constatn vector of regime 2.}
+\item{c2}{constant vector of regime 2.}
 
 \item{delay}{two elements (i,d) with "i" being the component index and "d" the delay for threshold variable.}
 

@@ -5,12 +5,13 @@
 \title{Generate a CFAR(2) Process with Heteroscedasticity and Irregular Observation Locations}
 \usage{
 g_cfar2h(tmax = 1001, grid = 1000, rho = 1, min_obs = 40,
-  pois = 5, phi_func1 = NULL, phi_func2 = NULL, weight = NULL)
+  pois = 5, phi_func1 = NULL, phi_func2 = NULL, weight = NULL,
+  ini = 100)
 }
 \arguments{
 \item{tmax}{length of time.}
 
-\item{grid}{the number of grid points used to constrcut the functional time series.}
+\item{grid}{the number of grid points used to construct the functional time series.}
 
 \item{rho}{parameter for O-U process (noise process).}
 
@@ -23,6 +24,8 @@ g_cfar2h(tmax = 1001, grid = 1000, rho = 1, min_obs = 40,
 \item{phi_func2}{the second convolutional function. Default is 0.7*x^4-0.1*x^3-0.15*x.}
 
 \item{weight}{the weight function to determine the standard deviation of O-U process (noise process). Default is 1.}
+
+\item{ini}{the burn-in period.}
 }
 \value{
 The function returns a list with components:

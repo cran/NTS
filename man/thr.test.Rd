@@ -8,15 +8,15 @@ thr.test(y, p = 1, d = 1, thrV = NULL, ini = 40,
   include.mean = T)
 }
 \arguments{
-\item{y}{a time seris.}
+\item{y}{a time series.}
 
 \item{p}{AR order.}
 
-\item{d}{delay for the threhosld variable.}
+\item{d}{delay for the threshold variable.}
 
 \item{thrV}{threshold variable.}
 
-\item{ini}{inital number of data to start RLS estimation.}
+\item{ini}{initial number of data to start RLS estimation.}
 
 \item{include.mean}{a logical value for including constant terms.}
 }
@@ -30,10 +30,9 @@ thr.test(y, p = 1, d = 1, thrV = NULL, ini = 40,
 Threshold nonlinearity test.
 }
 \examples{
-arorder=rep(1,2)
-ar.coef=matrix(c(0.7,-0.8),2,1)
-y=uTAR.sim(100,arorder,ar.coef,1,0)
-thr.test(y$series,1,1,y$series,40,TRUE)
+phi=t(matrix(c(-0.3, 0.5,0.6,-0.3),2,2))
+y=uTAR.sim(nob=2000, arorder=c(2,2), phi=phi, d=2, thr=0.2, cnst=c(1,-1),sigma=c(1, 1))
+thr.test(y$series,p=2,d=2,ini=40,include.mean=TRUE)
 }
 \references{
 Tsay, R. (1989) Testing and Modeling Threshold Autoregressive Processes. \emph{Journal of the American Statistical Associations} \strong{84}(405), 231-240.

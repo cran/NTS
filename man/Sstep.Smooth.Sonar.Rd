@@ -13,9 +13,9 @@ Sstep.Smooth.Sonar(mm, xxt, xxt1, ww, vv, par)
 
 \item{xxt1}{the sample in the next iteration.}
 
-\item{ww}{\code{ww*t(ww)} is the state innovation covariance matrix.}
+\item{ww}{the forward filtering weight.}
 
-\item{vv}{\code{vv*t(vv)} is the covariance matrix of the observation noise.}
+\item{vv}{the backward smoothing weight.}
 
 \item{par}{a list of parameter values. \code{H} is the state coefficient matrix, and \code{W*t(W)} is the state innovation covariance matrix.}
 }
@@ -28,5 +28,5 @@ The function returns a list with the following components:
 This function uses the sequential importance sampling method to deal with a target with passive sonar for smoothing.
 }
 \references{
-Tsay, R. and Chen, R. (2019). Nonlinear Time Series Analysis. Wiley, New Jersey.
+Tsay, R. and Chen, R. (2018). Nonlinear Time Series Analysis. John Wiley & Sons, New Jersey.
 }

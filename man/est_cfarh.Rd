@@ -2,7 +2,7 @@
 % Please edit documentation in R/hello.R
 \name{est_cfarh}
 \alias{est_cfarh}
-\title{Estimation of a CFAR Process with Heteroscedasticity and Irregualr Observation Locations}
+\title{Estimation of a CFAR Process with Heteroscedasticity and Irregualar Observation Locations}
 \usage{
 est_cfarh(f, weight, p = 2, grid = 1000, df_b = 5, num_obs = NULL,
   x_pos = NULL)
@@ -14,7 +14,7 @@ est_cfarh(f, weight, p = 2, grid = 1000, df_b = 5, num_obs = NULL,
 
 \item{p}{CFAR order.}
 
-\item{grid}{the number of gird points used to constrct the functional time series and noise process. Default is 1000.}
+\item{grid}{the number of gird points used to construct the functional time series and noise process. Default is 1000.}
 
 \item{df_b}{the degrees of freedom for natural cubic splines. Default is 10.}
 
@@ -24,13 +24,13 @@ est_cfarh(f, weight, p = 2, grid = 1000, df_b = 5, num_obs = NULL,
 }
 \value{
 The function returns a list with components:
-\item{phi_coef}{estimated spline coefficients for convluaional function(s).}
-\item{phi_func}{estimated convoluational function(s).}
+\item{phi_coef}{estimated spline coefficients for convolutional function(s).}
+\item{phi_func}{estimated convolutional function(s).}
 \item{rho}{estimated rho for O-U process (noise process).}
 \item{sigma}{estimated sigma for O-U process (noise process).}
 }
 \description{
-Estimation of a CFAR process with heteroscedasticity and irregualr observation locations.
+Estimation of a CFAR process with heteroscedasticity and irregualar observation locations.
 }
 \references{
 Liu, X., Xiao, H., and Chen, R. (2016) Convolutional autoregressive models for functional time series. \emph{Journal of Econometrics}, 194, 263-282.

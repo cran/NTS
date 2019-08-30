@@ -5,8 +5,7 @@
 \title{Estimation of a Multivariate Two-Regime SETAR Model}
 \usage{
 mTAR(y, p1, p2, thr = NULL, thrV = NULL, delay = c(1, 1),
-  Trim = c(0.15, 0.85), k0 = 300, include.mean = TRUE,
-  score = "AIC")
+  Trim = c(0.1, 0.9), k0 = 300, include.mean = TRUE, score = "AIC")
 }
 \arguments{
 \item{y}{a (\code{nT}-by-\code{k}) data matrix of multivariate time series, where \code{nT} is the sample size and \code{k} is the dimension.}
@@ -30,7 +29,7 @@ mTAR(y, p1, p2, thr = NULL, thrV = NULL, delay = c(1, 1),
 \item{score}{the choice of criterion used in selection threshold, namely (AIC, det(RSS)).}
 }
 \value{
-mTAR returns a listh with the following components:
+mTAR returns a list with the following components:
 \item{data}{the data matrix, y.}
 \item{beta}{a (\code{p*k+1})-by-(\code{2k}) matrices. The first \code{k} columns show the estimation results in regime 1, and the second \code{k} columns show these in regime 2.}
 \item{arorder}{AR orders of regimes 1 and 2.}

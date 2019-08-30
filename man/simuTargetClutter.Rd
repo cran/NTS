@@ -37,5 +37,5 @@ The function simulates a target signal under clutter environment.
 data=simuTargetClutter(30,0.5,0.5,0.5,0,0.3,3,c(-30,30))
 }
 \references{
-Tsay, R. and Chen, R. (2019). Nonlinear Time Series Analysis. Wiley, New Jersey.
+Tsay, R. and Chen, R. (2018). Nonlinear Time Series Analysis. John Wiley & Sons, New Jersey.
 }

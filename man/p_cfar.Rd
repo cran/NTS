@@ -11,7 +11,7 @@ p_cfar(model, f, m = 3)
 
 \item{f}{the functional time series data.}
 
-\item{m}{the forecasting horizon.}
+\item{m}{the forecast horizon.}
 }
 \value{
 The function returns a prediction of the CFAR process.

@@ -18,9 +18,9 @@ backtest(m1, rt, orig, h, xre = NULL, fixed = NULL,
 
 \item{xre}{the independent variables.}
 
-\item{fixed}{parameter constriant.}
+\item{fixed}{parameter constraint.}
 
-\item{include.mean}{a logicial value for constant term of the model. Default is TRUE.}
+\item{include.mean}{a logical value for constant term of the model. Default is TRUE.}
 }
 \value{
 The function returns a list with following components:
@@ -28,7 +28,7 @@ The function returns a list with following components:
 \item{err}{observed value minus fitted value.}
 \item{rmse}{RMSE of out-of-sample forecasts.}
 \item{mabso}{mean absolute error of out-of-sample forecasts.}
-\item{bias}{bias of out-of-sample foecasts.}
+\item{bias}{bias of out-of-sample forecasts.}
 }
 \description{
 Backtest for an ARIMA time series model.

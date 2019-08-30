@@ -22,7 +22,7 @@ MKFstep.fading(mm, II, mu, SS, logww, yyy, par, xdim, ydim, resample)
 \item{par}{a list of parameter values. \code{HH} is the state coefficient matrix, \code{WW*t(WW)} is the state innovation covariance matrix,
 \code{VV*t(VV)} is the covariance matrix of the observation noise, \code{GG1} and \code{GG2} are the observation coefficient matrix.}
 
-\item{xdim}{the dimension of the state varible \code{x_t}.}
+\item{xdim}{the dimension of the state variable \code{x_t}.}
 
 \item{ydim}{the dimension of the observation \code{y_t}.}
 
@@ -33,11 +33,11 @@ The function returns a list with components:
 \item{xhat}{the fitted value.}
 \item{xhatRB}{the fitted value using Rao-Blackwellization.}
 \item{Iphat}{the estimated indicators.}
-\item{IphatRB}{the esitmated indicators using Rao-Blackwellization.}
+\item{IphatRB}{the estimated indicators using Rao-Blackwellization.}
 }
 \description{
 This function implements the one propagation step under mixture Kalman filter for fading channels.
 }
 \references{
-Tsay, R. and Chen, R. (2019). Nonlinear Time Series Analysis. Wiley, New Jersey.
+Tsay, R. and Chen, R. (2018). Nonlinear Time Series Analysis. John Wiley & Sons, New Jersey.
 }

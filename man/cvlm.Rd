@@ -24,5 +24,5 @@ The function returns a list with following components.
 The function checks linear models with cross-validation (out-of-sample prediction).
 }
 \references{
-Tsay, R. and Chen, R. (2019). Nonlinear Time Series Analysis. Wiley, New Jersey.
+Tsay, R. and Chen, R. (2018). Nonlinear Time Series Analysis. John Wiley & Sons, New Jersey.
 }

@@ -29,5 +29,5 @@ The function returns a list with following components.
 The function sets up the predictor matrix in a neural network for time series data.
 }
 \references{
-Tsay, R. and Chen, R. (2019). Nonlinear Time Series Analysis. Wiley, New Jersey.
+Tsay, R. and Chen, R. (2018). Nonlinear Time Series Analysis. John Wiley & Sons, New Jersey.
 }

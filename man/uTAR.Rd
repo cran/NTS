@@ -4,8 +4,8 @@
 \alias{uTAR}
 \title{Estimation of a Univariate Two-Regime SETAR Model}
 \usage{
-uTAR(y, p1, p2, d = 1, thrV = NULL, Trim = c(0.15, 0.85), k0 = 300,
-  include.mean = T, thrQ = c(0, 1))
+uTAR(y, p1, p2, d = 1, thrV = NULL, Trim = c(0.1, 0.9), k0 = 300,
+  include.mean = TRUE, thrQ = c(0, 1))
 }
 \arguments{
 \item{y}{a vector of time series.}
@@ -18,7 +18,7 @@ uTAR(y, p1, p2, d = 1, thrV = NULL, Trim = c(0.15, 0.85), k0 = 300,
 
 \item{Trim}{lower and upper quantiles for possible threshold values.}
 
-\item{k0}{the maximum number of threshold values to be evaluated. If the sample size is large (> 3000), then k0 = floor(nT*0.5).The default is k0=300. But k0 = floor(nT*0.8) if nT < 300.}
+\item{k0}{the maximum number of threshold values to be evaluated. If the sample size is large (> 3000), then k0 = floor(nT*0.5). The default is k0=300. But k0 = floor(nT*0.8) if nT < 300.}
 
 \item{include.mean}{a logical value indicating whether constant terms are included.}
 
@@ -30,7 +30,7 @@ uTAR returns a list with components:
 \item{arorder}{AR orders of regimes 1 and 2.}
 \item{delay}{the delay for threshold variable.}
 \item{residuals}{estimated innovations.}
-\item{coef}{a 2-by-(p+1) matrices. The first row show the estimation results in regime 1, and the second row shows these in regime 2.}
+\item{coef}{a 2-by-(p+1) matrices. The first row shows the estimation results in regime 1, and the second row shows these in regime 2.}
 \item{sigma}{estimated innovational covariance matrices of regimes 1 and 2.}
 \item{nobs}{numbers of observations in regimes 1 and 2.}
 \item{model1,model2}{estimated models of regimes 1 and 2.}
@@ -46,10 +46,9 @@ Estimation of a univariate two-regime SETAR model, including threshold value.
 The procedure of Li and Tong (2016) is used to search for the threshold.
 }
 \examples{
-arorder=rep(1,2)
-ar.coef=matrix(c(0.7,-0.8),2,1)
-y=uTAR.sim(100,arorder,ar.coef,1,0)
-est=uTAR(y$series,1,1,1,y$series,c(0.2,0.8),100,TRUE,c(0.2,0.8))
+phi=t(matrix(c(-0.3, 0.5,0.6,-0.3),2,2))
+y=uTAR.sim(nob=2000, arorder=c(2,2), phi=phi, d=2, thr=0.2, cnst=c(1,-1),sigma=c(1, 1))
+est=uTAR(y=y$series,p1=2,p2=2,d=2,k0=50,thrQ=c(0,1),Trim=c(0.1,0.9),include.mean=TRUE)
 }
 \references{
 Li, D., and Tong. H. (2016) Nested sub-sample search algorithm for estimation of threshold models. \emph{Statisitca Sinica}, 1543-1554.

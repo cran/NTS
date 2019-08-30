@@ -5,7 +5,7 @@
 \title{Generate a CFAR Process}
 \usage{
 g_cfar(tmax = 1001, rho = 5, phi_list = NULL, grid = 1000,
-  sigma = 1)
+  sigma = 1, ini = 100)
 }
 \arguments{
 \item{tmax}{length of time.}
@@ -14,13 +14,15 @@ g_cfar(tmax = 1001, rho = 5, phi_list = NULL, grid = 1000,
 
 \item{phi_list}{the convolutional function(s). Default is the density function of normal distribution with mean 0 and standard deviation 0.1.}
 
-\item{grid}{the number of grid points used to constrcut the functional time series. Default is 1000.}
+\item{grid}{the number of grid points used to construct the functional time series. Default is 1000.}
 
 \item{sigma}{the standard deviation of O-U process. Default is 1.}
+
+\item{ini}{the burn-in period.}
 }
 \value{
 The function returns a list with components:
-\item{cfar}{a tmax-by-(grid+1) matrix following a CFAR(1) process.}
+\item{cfar}{a tmax-by-(grid+1) matrix following a CFAR(p) process.}
 \item{epsilon}{the innovation at time tmax.}
 }
 \description{

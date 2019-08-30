@@ -22,6 +22,7 @@ rankQ(zt, lag = 10, output = TRUE)
 Performs rank-based portmanteau statistics.
 }
 \examples{
-y=rnorm(1000)
-rankQ(y,10,output=TRUE)
+phi=t(matrix(c(-0.3, 0.5,0.6,-0.3),2,2))
+y=uTAR.sim(nob=2000, arorder=c(2,2), phi=phi, d=2, thr=0.2, cnst=c(1,-1),sigma=c(1, 1))
+rankQ(y$series,10,output=TRUE)
 }

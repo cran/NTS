@@ -19,7 +19,7 @@ Sstep.Clutter.Full.RB(mm, xx, logww, yyy, par, xdim, ydim, resample.sch)
 \code{ssv} is the standard deviation for the observation noise, \code{pd} is the probability to observe the true signal, \code{nyy} the dimension of the data,
 and \code{yr} is the range of the data.}
 
-\item{xdim}{the dimension of the state varible \code{x_t}.}
+\item{xdim}{the dimension of the state variable \code{x_t}.}
 
 \item{ydim}{the dimension of the observation \code{y_t}.}
 
@@ -33,8 +33,8 @@ The function returns a list with the following components:
 \item{xhatRB}{the fitted values using Rao-Blackwellization.}
 }
 \description{
-This function performs one step propagation using the sequential importantce sampling with full information proposal distribuiton and returns Rao-Blackwellization estimate of mean under clutter environment.
+This function performs one step propagation using the sequential importance sampling with full information proposal distribution and returns Rao-Blackwellization estimate of mean under clutter environment.
 }
 \references{
-Tsay, R. and Chen, R. (2019). Nonlinear Time Series Analysis. Wiley, New Jersey.
+Tsay, R. and Chen, R. (2018). Nonlinear Time Series Analysis. John Wiley & Sons, New Jersey.
 }

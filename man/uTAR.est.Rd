@@ -12,11 +12,11 @@ uTAR.est(y, arorder = c(1, 1), thr = c(0), d = 1, thrV = NULL,
 
 \item{arorder}{AR order of each regime. The number of regime is the length of arorder.}
 
-\item{thr}{given threshould(s). There are k-1 threshold for a k-regime model.}
+\item{thr}{given threshold(s). There are k-1 threshold for a k-regime model.}
 
 \item{d}{delay for threshold variable, default is 1.}
 
-\item{thrV}{external threhold variable if any. If it is not NULL, thrV must have the same length as that of y.}
+\item{thrV}{external threshold variable if any. If it is not NULL, thrV must have the same length as that of y.}
 
 \item{include.mean}{a logical value indicating whether constant terms are included. Default is TRUE.}
 
@@ -27,7 +27,7 @@ uTAR.est returns a list with components:
 \item{data}{the data matrix, y.}
 \item{k}{the dimension of y.}
 \item{arorder}{AR orders of regimes 1 and 2.}
-\item{coefs}{a (p*k+1)-by-(2k) matrices. The first row show the estimation results in regime 1, and the second row shows these in regime 2.}
+\item{coefs}{a (p*k+1)-by-(2k) matrices. The first row shows the estimation results in regime 1, and the second row shows these in regime 2.}
 \item{sigma}{estimated innovational covariance matrices of regimes 1 and 2.}
 \item{thr}{threshold value.}
 \item{residuals}{estimated innovations.}
@@ -42,8 +42,8 @@ General estimation of TAR models with known threshold values.
 It perform LS estimation of a univariate TAR model, and can handle multiple regimes.
 }
 \examples{
-arorder=rep(1,2)
-ar.coef=matrix(c(0.7,-0.8),2,1)
-y=uTAR.sim(100,arorder,ar.coef,1,0)
-est=uTAR.est(y$series,arorder,0,1)
+phi=t(matrix(c(-0.3, 0.5,0.6,-0.3),2,2))
+y=uTAR.sim(nob=2000, arorder=c(2,2), phi=phi, d=2, thr=0.2, cnst=c(1,-1),sigma=c(1, 1))
+thr.est=uTAR.grid(y=y$series, p1=2, p2=2, d=2, thrQ=c(0,1),Trim=c(0.1,0.9))
+est=uTAR.est(y=y$series, arorder=c(2,2), thr=thr.est$thr, d=2)
 }

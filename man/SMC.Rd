@@ -24,7 +24,7 @@ observation at current time step. It should return \code{xx} (the samples xt) an
 
 \item{xx.init}{the initial samples of \code{x_0}.}
 
-\item{xdim}{the dimension of the state varible \code{x_t}.}
+\item{xdim}{the dimension of the state variable \code{x_t}.}
 
 \item{ydim}{the dimension of the observation \code{y_t}.}
 
@@ -61,5 +61,5 @@ resample.sch=rep.int(1,nobs)
 out= SMC(Sstep.Clutter,nobs,simu$yy,mm,par,xx.init,xdim,ydim,resample.sch)
 }
 \references{
-Tsay, R. and Chen, R. (2019). Nonlinear Time Series Analysis. Wiley, New Jersey.
+Tsay, R. and Chen, R. (2018). Nonlinear Time Series Analysis. John Wiley & Sons, New Jersey.
 }

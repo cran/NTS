@@ -24,5 +24,5 @@ The function returns the log-likelihood of the data.
 The function implements the sequential Monte Carlo method using sequential importance sampling for stochastic volatility models.
 }
 \references{
-Tsay, R. and Chen, R. (2019). Nonlinear Time Series Analysis. Wiley, New Jersey.
+Tsay, R. and Chen, R. (2018). Nonlinear Time Series Analysis. John Wiley & Sons, New Jersey.
 }

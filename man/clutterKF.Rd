@@ -23,7 +23,7 @@ The function returns a list with the following components:
 \item{shat}{the fitted speed.}
 }
 \description{
-This function implments Kalman filter to track a moving target under clutter environment with known indicators.
+This function implements Kalman filter to track a moving target under clutter environment with known indicators.
 }
 \examples{
 nobs <- 100; pd <- 0.95; ssw <- 0.1; ssv <- 0.5;
@@ -33,5 +33,5 @@ simu <- simuTargetClutter(nobs,pd,ssw,ssv,xx0,ss0,nyy,yrange)
 outKF <- clutterKF(nobs,ssw,ssv,simu$yy,simu$ii)
 }
 \references{
-Tsay, R. and Chen, R. (2019). Nonlinear Time Series Analysis. Wiley, New Jersey.
+Tsay, R. and Chen, R. (2018). Nonlinear Time Series Analysis. John Wiley & Sons, New Jersey.
 }

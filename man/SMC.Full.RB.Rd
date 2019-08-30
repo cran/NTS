@@ -39,5 +39,5 @@ The function returns a list with the following components:
 Generic sequential Monte Carlo using full information proposal distribution with Rao-Blackwellization estimate, and delay is 0.
 }
 \references{
-Tsay, R. and Chen, R. (2019). Nonlinear Time Series Analysis. Wiley, New Jersey.
+Tsay, R. and Chen, R. (2018). Nonlinear Time Series Analysis. John Wiley & Sons, New Jersey.
 }

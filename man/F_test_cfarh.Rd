@@ -12,9 +12,9 @@ F_test_cfarh(f, weight, p.max = 3, grid = 1000, df_b = 10,
 
 \item{weight}{the covariance functions for noise process.}
 
-\item{p.max}{maximum CFAR order. Default is 3.}
+\item{p.max}{the maximum CFAR order. Default is 3.}
 
-\item{grid}{the number of gird points used to constrct the functional time series and noise process. Default is 1000.}
+\item{grid}{the number of gird points used to construct the functional time series and noise process. Default is 1000.}
 
 \item{df_b}{the degrees of freedom for natural cubic splines. Default is 10.}
 

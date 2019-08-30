@@ -12,11 +12,11 @@ mTAR.est(y, arorder = c(1, 1), thr = c(0), delay = c(1, 1),
 
 \item{arorder}{AR order of each regime. The number of regime is length of arorder.}
 
-\item{thr}{threshould value(s). There are k-1 threshold for a k-regime model.}
+\item{thr}{threshold value(s). There are k-1 threshold for a k-regime model.}
 
 \item{delay}{two elements (i,d) with "i" being the component and "d" the delay for threshold variable.}
 
-\item{thrV}{external threhold variable if any. If thrV is not null, it must have the same number of observations as y-series.}
+\item{thrV}{external threshold variable if any. If thrV is not null, it must have the same number of observations as y-series.}
 
 \item{include.mean}{logical values indicating whether constant terms are included. Default is TRUE for all.}
 
@@ -39,7 +39,7 @@ mTAR.est returns a list with the following components:
 \item{thrV}{values of threshold variable.}
 }
 \description{
-Estimation of mutlivariate TAR models with given thresholds. It can handle multiple regimes.
+Estimation of multivariate TAR models with given thresholds. It can handle multiple regimes.
 }
 \examples{
 phi1=matrix(c(0.5,0.7,0.3,0.2),2,2)

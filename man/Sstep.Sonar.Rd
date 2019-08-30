@@ -18,7 +18,7 @@ Sstep.Sonar(mm, xx, logww, yy, par, xdim = 1, ydim = 1)
 \item{par}{a list of parameter values. \code{H} is the state coefficient matrix, \code{W*t(W)} is the state innovation covariance matrix,
 \code{V*t(V)} is the covariance matrix of the observation noise, \code{s2} is the second sonar location.}
 
-\item{xdim}{the dimension of the state varible \code{x_t}.}
+\item{xdim}{the dimension of the state variable \code{x_t}.}
 
 \item{ydim}{the dimension of the observation \code{y_t}.}
 }
@@ -31,5 +31,5 @@ The function returns a list with the following components:
 This function implements one step of the sequential importance sampling method for a target with passive sonar.
 }
 \references{
-Tsay, R. and Chen, R. (2019). Nonlinear Time Series Analysis. Wiley, New Jersey.
+Tsay, R. and Chen, R. (2018). Nonlinear Time Series Analysis. John Wiley & Sons, New Jersey.
 }

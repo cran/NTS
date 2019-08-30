@@ -11,7 +11,7 @@ simPassiveSonar(nn = 200, q, r, start, seed)
 
 \item{q}{contains the information about the covariance of the noise.}
 
-\item{r}{contains the information about \code{V}, where \code{V*t(V)} is the ocvariance of the observation noise.}
+\item{r}{contains the information about \code{V}, where \code{V*t(V)} is the covariance matrix of the observation noise.}
 
 \item{start}{the initial value.}
 

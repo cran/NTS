@@ -39,11 +39,11 @@ The function returns a list with components:
 \item{xhat}{the fitted value.}
 \item{xhatRB}{the fitted value using Rao-Blackwellization.}
 \item{Iphat}{the estimated indicators.}
-\item{IphatRB}{the esitmated indicators using Rao-Blackwellization.}
+\item{IphatRB}{the estimated indicators using Rao-Blackwellization.}
 }
 \description{
 This function implements the full information propagation step under mixture Kalman filter with full information proposal distribution and Rao-Blackwellization, no delay.
 }
 \references{
-Tsay, R. and Chen, R. (2019). Nonlinear Time Series Analysis. Wiley, New Jersey.
+Tsay, R. and Chen, R. (2018). Nonlinear Time Series Analysis. John Wiley & Sons, New Jersey.
 }

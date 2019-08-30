@@ -2,7 +2,7 @@
 % Please edit documentation in R/hello.R
 \name{ACMx}
 \alias{ACMx}
-\title{Estimation of Autoregressive Condtional Mean Models}
+\title{Estimation of Autoregressive Conditional Mean Models}
 \usage{
 ACMx(y, order = c(1, 1), X = NULL, cond.dist = "po", ini = NULL)
 }
@@ -26,10 +26,16 @@ ACMx returns a list with components:
 \item{sresi}{standardized residuals.}
 }
 \description{
-Estimation of autoregressive conditionl mean models with exogeneous variables.
+Estimation of autoregressive conditional mean models with exogenous variables.
 }
 \examples{
-X=matrix(rnorm(100,100,1))
-y=rpois(100,10)
-ACMx(y,c(1,1),X,"po")
+x=rnorm(1000)*0.1
+y=matrix(0,1000,1)
+y[1]=2
+lambda=matrix(0,1000,1)
+for (i in 2:1000){
+	lambda[i]=2+0.2*y[i-1]/exp(x[i-1])+0.5*lambda[i-1]
+	y[i]=rpois(1,exp(x[i])*lambda[i])
+}
+ACMx(y,order=c(1,1),x,"po")
 }

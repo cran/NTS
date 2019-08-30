@@ -18,7 +18,7 @@ SISstep.fading(mm, xx, logww, yyy, par, xdim2, ydim)
 \item{par}{a list of parameter values.  \code{HH} is the state coefficient model, \code{WW*t(WW)} is the state innovation covariance matrix,
 \code{VV*t(VV)} is the covariance of the observation noise, \code{GG} is the observation model.}
 
-\item{xdim2}{the dimension of the state varible \code{x_t}.}
+\item{xdim2}{the dimension of the state variable \code{x_t}.}
 
 \item{ydim}{the dimension of the observation \code{y_t}.}
 }
@@ -31,5 +31,5 @@ The function returns a list with the following components:
 This function implements one step of the sequential importance sampling method for fading channels.
 }
 \references{
-Tsay, R. and Chen, R. (2019). Nonlinear Time Series Analysis. Wiley, New Jersey.
+Tsay, R. and Chen, R. (2018). Nonlinear Time Series Analysis. John Wiley & Sons, New Jersey.
 }
