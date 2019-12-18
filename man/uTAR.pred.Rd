@@ -4,8 +4,7 @@
 \alias{uTAR.pred}
 \title{Prediction of A Fitted Univariate TAR Model}
 \usage{
-uTAR.pred(model, orig, h = 1, iterations = 3000, ci = 0.95,
-  output = TRUE)
+uTAR.pred(model, orig, h = 1, iterations = 3000, ci = 0.95, output = TRUE)
 }
 \arguments{
 \item{model}{univariate TAR model.}

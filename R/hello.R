@@ -4,9 +4,10 @@
 #
 # Some useful keyboard shortcuts for package authoring:
 #
-#   Build and Reload Package:  'Ctrl + Shift + B'
-#   Check Package:             'Ctrl + Shift + E'
-#   Test Package:              'Ctrl + Shift + T'
+#   Install Package:           'Cmd + Shift + B'
+#   Check Package:             'Cmd + Shift + E'
+#   Test Package:              'Cmd + Shift + T'
+
 
 
 #' Estimation of Autoregressive Conditional Mean Models
@@ -801,14 +802,14 @@ g_cfar2h <- function(tmax=1001,grid=1000,rho=1,min_obs=40, pois=5,phi_func1=NULL
 #'
 #' Estimation of a CFAR process.
 #' @param f the functional time series.
-#' @param p CFAR order.
+#' @param p the CFAR order.
 #' @param df_b the degrees of freedom for natural cubic splines. Default is 10.
 #' @param grid the number of gird points used to construct the functional time series and noise process. Default is 1000.
 #' @references
 #' Liu, X., Xiao, H., and Chen, R. (2016) Convolutional autoregressive models for functional time series. \emph{Journal of Econometrics}, 194, 263-282.
 #' @return The function returns a list with components:
-#' \item{phi_coef}{estimated spline coefficients for convolutional function values, a (2*grid+1)-by-p matrix.}
-#' \item{phi_func}{estimated convolutional function(s), a (df_b+1)-by-p matrix.}
+#' \item{phi_coef}{the estimated spline coefficients for convolutional function values, a (2*grid+1)-by-p matrix.}
+#' \item{phi_func}{the estimated convolutional function(s), a (df_b+1)-by-p matrix.}
 #' \item{rho}{estimated rho for O-U process (noise process).}
 #' \item{sigma}{estimated sigma for O-U process (noise process).}
 #' @import splines
@@ -891,9 +892,9 @@ est_cfar <- function(f,p=3,df_b=10,grid=1000){
   }
   indep.p=indep.tmp
 
-  pdf4=function(para4)
+  pdf=function(para)
   {
-    psi= para4;	### correlation between two adjacent observation point exp(-rho/n)
+    psi= para^(1/n);	### correlation between two adjacent observation point exp(-para/n)
     psi_matinv= matrix(0, n+1, n+1)	### correlation matrix of error process at observation points
     psi_matinv[1,1]=1
     psi_matinv[n+1,n+1]=1;
@@ -924,12 +925,13 @@ est_cfar <- function(f,p=3,df_b=10,grid=1000){
       ehat= epart+ehat
       log.mat=log.mat+ log(det(psi_matinv))
     }
-    l=-(t-p)*n/2*log(ehat)+1/2*log.mat
+    l=-(t-p)*(n+1)/2*log(ehat)+1/2*log.mat
     return(-l);
   }
-  para4= exp(-5)
-  result4=optim(para4,pdf4, lower=0.001, upper=0.9999, method='L-BFGS-B')
-  psi=result4$par
+  para= exp(-5)
+  result=optim(para,pdf, lower=0.0001, upper=0.9999, method='L-BFGS-B')
+  para=result$par		####exp(-rho)
+  psi=para^(1/n)		####exp(-rho/n)
   psi_matinv= matrix(0, n+1, n+1)
   psi_matinv[1,1]=1
   psi_matinv[n+1,n+1]=1;
@@ -961,7 +963,7 @@ est_cfar <- function(f,p=3,df_b=10,grid=1000){
     epart= t(eps)%*%psi_matinv %*%eps
     ehat= epart+ehat
   }
-  rho_hat= -log(psi)*n
+  rho_hat= -log(para)
   sigma_hat=sqrt(ehat/((t-p)*(n+1))/(1-psi^2))
   phi_coef=t(matrix(phihat,coef_b,p))
   est_cfar <- list(phi_coef=phi_coef,phi_func=phihat_func,rho=rho_hat,sigma=sigma_hat)
@@ -971,9 +973,9 @@ est_cfar <- function(f,p=3,df_b=10,grid=1000){
 
 #' F Test for a CFAR Process
 #'
-#' F test for a CFAR process to specify CFAR order.
+#' F test for a CFAR process to specify the CFAR order.
 #' @param f the functional time series.
-#' @param p.max maximum CFAR order. Default is 6.
+#' @param p.max the maximum CFAR order. Default is 6.
 #' @param df_b the degrees of freedom for natural cubic splines. Default is 10.
 #' @param grid the number of gird points used to construct the functional time series and noise process. Default is 1000.
 #' @references
@@ -1080,26 +1082,25 @@ F_test_cfar <- function(f,p.max=6,df_b=10,grid=1000){
   ssr1= sum(diag((predict)%*%phi_matinv%*% t(predict)))
   sse1= sum(diag((f[2:t,]-predict[1:(t-1),])%*%phi_matinv%*% t(f[2:t,]-predict[1:(t-1),])))
   sse0=sum(diag(f[2:t,]%*%phi_matinv%*% t(f[2:t,])))
-  statistic= (sse0-sse1)/coef_b/sse1*((n+1)*(t-2)-coef_b)
-  pval=1-pf(statistic,coef_b,(t-2)*(n+1)-coef_b)
+  statistic= (sse0-sse1)/coef_b/sse1*((n+1)*(t-1)-coef_b)
+  pval=1-pf(statistic,coef_b,(t-1)*(n+1)-coef_b)
   cat("Test and p-value of Order 0 vs Order 1: ","\n")
   print(c(statistic,pval))
 
-  p=1
-  sse.pre= sum(diag((f[(p+2):t,]-predict[2:(t-p),])%*%phi_matinv%*% t(f[(p+2):t,]-predict[2:(t-p),])))
-
+  indep.p=indep
   for(p in 2:p.max){
+    indep.pre=indep.p[(n+2):((n+1)*(t-p+1)),]
     indep.tmp=NULL
     for(i in 1:p){
       tmp=indep[((i-1)*(n+1)+1):((n+1)*(t-p-1+i)),]
       indep.tmp=cbind(tmp,indep.tmp)
     }
     indep.p=indep.tmp
-    pdf4=function(para4)
+    pdf=function(para)
     {
       mat1= matrix(0, coef_b*p, coef_b*p);
       mat2= matrix(0, coef_b*p, 1);
-      psi= para4;
+      psi= para^(1/n);
       phi_matinv=matrix(0, n+1, n+1)
       phi_matinv[1,1]=1;
       phi_matinv[n+1,n+1]=1;
@@ -1133,13 +1134,14 @@ F_test_cfar <- function(f,p.max=6,df_b=10,grid=1000){
       l=-((t-p)*(n+1))/2*log(ehat)+1/2*log.mat
       return(-l);
     }
-    para4= exp(-5)
-    result4=optim(para4,pdf4, lower=0.001, upper=0.999, method='L-BFGS-B')
+    para= exp(-5)
+    result=optim(para,pdf, lower=0.0001, upper=0.9999, method='L-BFGS-B')
 
     mat1= matrix(0, p*coef_b, p*coef_b);
     mat2= matrix(0, coef_b*p, 1);
     psi_invall=matrix(0,(n+1)*(t-1),(n+1))
-    psi=result4$par
+    para=result$par
+    psi=para^(1/n)
     phi_matinv=matrix(0, n+1, n+1)
     phi_matinv[1,1]=1;
     phi_matinv[n+1,n+1]=1;
@@ -1163,15 +1165,43 @@ F_test_cfar <- function(f,p.max=6,df_b=10,grid=1000){
     predict= t(matrix(indep.p%*%phihat,ncol=t-p,nrow=n+1))
     ssr.p= sum(diag((predict)%*%phi_matinv%*% t(predict)))
     sse.p= sum(diag((f[(p+1):t,]-predict)%*%phi_matinv%*% t(f[(p+1):t,]-predict)))
-    statistic= (sse.pre-sse.p)/coef_b/sse.p*((n+1)*(t-p-1)-p*coef_b)
+
+
+
+    mat1= matrix(0, (p-1)*coef_b, (p-1)*coef_b);
+    mat2= matrix(0, coef_b*(p-1), 1);
+    psi_invall=matrix(0,(n+1)*(t-1),(n+1))
+    phi_matinv=matrix(0, n+1, n+1)
+    phi_matinv[1,1]=1;
+    phi_matinv[n+1,n+1]=1;
+    phi_matinv[1,2]= -psi;
+    phi_matinv[n+1,n]= -psi
+    psi_matinv=phi_matinv
+    for (i in 2:n){
+      phi_matinv[i,i]= 1+psi^2;
+      phi_matinv[i,i+1]= -psi;
+      phi_matinv[i,i-1]= -psi
+    }
+    psi_matinv=phi_matinv
+    for(i in (p+1):t){
+      tmp.n=n+1
+      M_t= indep.pre[(i-p-1)*(n+1)+(1:tmp.n),]
+      tmp_mat= t(M_t) %*% psi_matinv;
+      mat1= mat1+ tmp_mat %*% M_t;
+      mat2= mat2+ tmp_mat %*% f[i,1:tmp.n];
+    }
+    phihat= solve(mat1)%*%mat2
+    predict= t(matrix(indep.pre%*%phihat,ncol=t-p,nrow=n+1))
+    sse.pre= sum(diag((f[(p+1):t,]-predict)%*%phi_matinv%*% t(f[(p+1):t,]-predict)))
+
+
+    statistic= (sse.pre-sse.p)/coef_b/sse.p*((n+1)*(t-p)-p*coef_b)
     pval=1-pf(statistic,coef_b,(t-p)*(n+1)-p*coef_b)
     cat("Test and  p-value of Order", p-1, "vs Order",p,": ","\n")
     print(c(statistic,pval))
     sse.pre= sum(diag((f[(p+2):t,]-predict[2:(t-p),])%*%phi_matinv%*% t(f[(p+2):t,]-predict[2:(t-p),])))
   }
 }
-
-
 
 #' F Test for a CFAR Process with Heteroscedasticity and Irregular Observation Locations
 #'
@@ -1201,13 +1231,13 @@ F_test_cfarh <- function(f,weight,p.max=3,grid=1000,df_b=10,num_obs=NULL,x_pos=N
 
   if(is.null(num_obs)){
     num_obs=dim(f)[2]
-    n=dim(f)[2]
+    n=dim(f)[2]-1
   }else{
-    n=max(num_obs)
+    n=max(num_obs)-1
   }
 
   if(length(num_obs)!=t){
-    num_obs=rep(n,t)
+    num_obs=rep(n+1,t)
   }
   if(is.null(df_b)){
     df_b=10
@@ -1235,7 +1265,7 @@ F_test_cfarh <- function(f,weight,p.max=3,grid=1000,df_b=10,num_obs=NULL,x_pos=N
   bstar_grid= matrix(0, grid+1, coef_b)
   b_matrix= matrix(0, (grid+1), (grid+1))
   bstar_grid_full= matrix(0, (grid+1)*t,coef_b)
-  index=matrix(0,t,n)
+  index=matrix(0,t,1+n)
   for(i in 1:t){
     for(j in 1:num_obs[i]){
       index[i,j]=which(abs(x_pos[i,j]-x_grid)==min(abs(x_pos[i,j]-x_grid)))
@@ -1296,8 +1326,8 @@ F_test_cfarh <- function(f,weight,p.max=3,grid=1000,df_b=10,num_obs=NULL,x_pos=N
     l=-sum(num_obs[2:t])/2*log(ehat)+1/2*log.mat	### the number defined in formula (14)
     return(-l);
   }
-  para4= exp(-1)
-  result4=optim(para4,pdf4, lower=0.001, upper=0.999, method='L-BFGS-B')
+  para4= exp(-5)
+  result4=optim(para4,pdf4, lower=0.0001, upper=0.9999, method='L-BFGS-B')
   mat1= matrix(0, df_b+1, df_b+1);
   mat2= matrix(0, df_b+1, 1);
   psi_invall=matrix(0,(n+1)*(t-1),(n+1))
@@ -1328,7 +1358,7 @@ F_test_cfarh <- function(f,weight,p.max=3,grid=1000,df_b=10,num_obs=NULL,x_pos=N
     ehat= epart+ehat
   }
   rho_hat= -log(psi)
-  sigma_hat=ehat/sum(num_obs[2:t])*2*rho_hat
+  sigma_hat=sqrt(ehat/sum(num_obs[2:t]))
 
   sigma_hat1=sigma_hat
   rho_hat1=rho_hat
@@ -1358,7 +1388,7 @@ F_test_cfarh <- function(f,weight,p.max=3,grid=1000,df_b=10,num_obs=NULL,x_pos=N
     ehat= epart+ehat
   }
   rho_hat= -log(psi)
-  sigma_hat=ehat/sum(num_obs[2:t])*2*rho_hat
+  sigma_hat=sqrt(ehat/sum(num_obs[2:t]))
   rho_hat0=rho_hat
   sigma_hat0=sigma_hat
   sse0=0
@@ -1380,6 +1410,7 @@ F_test_cfarh <- function(f,weight,p.max=3,grid=1000,df_b=10,num_obs=NULL,x_pos=N
     for(p in 2:p.max){
       indep.pre=indep.p[(n+2):((n+1)*(t-p+1)),]
       indep.tmp=indep
+      index=matrix(0,t,1+n)
       for (i in 1:(t-p)){
         for(j in 1:num_obs[i+p]){
           index[i+p,j]= which(abs(x_pos[i+p,j]-x_grid)==min(abs(x_pos[i+p,j]-x_grid)))
@@ -1427,8 +1458,8 @@ F_test_cfarh <- function(f,weight,p.max=3,grid=1000,df_b=10,num_obs=NULL,x_pos=N
         l=-sum(num_obs[(p+1):t])/2*log(ehat)+1/2*log.mat	### the number defined in formula (14)
         return(-l);
       }
-      para4= exp(-1)
-      result4=optim(para4,pdf4, lower=0.001, upper=0.999, method='L-BFGS-B')
+      para4= exp(-5)
+      result4=optim(para4,pdf4, lower=0.0001, upper=0.9999, method='L-BFGS-B')
       mat1= matrix(0, p*(df_b+1), p*(df_b+1));
       mat2= matrix(0, p*(df_b+1), 1);
       psi_invall=matrix(0,(n+1)*(t-1),(n+1))
@@ -1459,12 +1490,12 @@ F_test_cfarh <- function(f,weight,p.max=3,grid=1000,df_b=10,num_obs=NULL,x_pos=N
         ehat= epart+ehat
       }
       rho_hat= -log(psi)
-      sigma_hat=ehat/sum(num_obs[(p+1):t])*2*rho_hat
+      sigma_hat=sqrt(ehat/sum(num_obs[(p+1):t]))
 
       sigma_hat1=sigma_hat
       rho_hat1=rho_hat
       predict= t(matrix(indep.p%*%phihat,ncol=t-p,nrow=n+1))
-      ssr.p= 0
+      ssr.p=0
       sse.p=0
       for (i in (p+1):t){
         tmp.n=num_obs[i]
@@ -1503,7 +1534,7 @@ F_test_cfarh <- function(f,weight,p.max=3,grid=1000,df_b=10,num_obs=NULL,x_pos=N
         ssr.pre= ssr.pre+ sum((predict[i-p,1:tmp.n] %*% psi_matinv) * (predict[i-p,1:tmp.n]))
         sse.pre= sse.pre+ sum(((f[i,1:tmp.n]- predict[i-p,1:tmp.n]) %*% psi_matinv) *(f[i,1:tmp.n]-predict[i-p,1:tmp.n]))
       }
-      statistic= (sse.pre-sse.p)/coef_b/sse.p*(sum(num_obs[(p+1):t])-coef_b)
+      statistic= (sse.pre-sse.p)/coef_b/sse.p*(sum(num_obs[(p+1):t])-p*coef_b)
       pval=1-pf(statistic,coef_b,sum(num_obs[(p+1):t])-coef_b)
       cat("Test and  p-value of Order",p-1," vs Order", p,": ","\n")
       print(c(statistic,pval))
@@ -1512,14 +1543,12 @@ F_test_cfarh <- function(f,weight,p.max=3,grid=1000,df_b=10,num_obs=NULL,x_pos=N
 }
 
 
-
-
 #' Estimation of a CFAR Process with Heteroscedasticity and Irregualar Observation Locations
 #'
 #' Estimation of a CFAR process with heteroscedasticity and irregualar observation locations.
 #' @param f the functional time series.
 #' @param weight the covariance functions of noise process.
-#' @param p CFAR order.
+#' @param p the CFAR order.
 #' @param grid the number of gird points used to construct the functional time series and noise process. Default is 1000.
 #' @param df_b the degrees of freedom for natural cubic splines. Default is 10.
 #' @param num_obs the numbers of observations. It is a t-by-1 vector, where t is the length of time.
@@ -1527,8 +1556,8 @@ F_test_cfarh <- function(f,weight,p.max=3,grid=1000,df_b=10,num_obs=NULL,x_pos=N
 #' @references
 #' Liu, X., Xiao, H., and Chen, R. (2016) Convolutional autoregressive models for functional time series. \emph{Journal of Econometrics}, 194, 263-282.
 #' @return The function returns a list with components:
-#' \item{phi_coef}{estimated spline coefficients for convolutional function(s).}
-#' \item{phi_func}{estimated convolutional function(s).}
+#' \item{phi_coef}{the estimated spline coefficients for convolutional function(s).}
+#' \item{phi_func}{the estimated convolutional function(s).}
 #' \item{rho}{estimated rho for O-U process (noise process).}
 #' \item{sigma}{estimated sigma for O-U process (noise process).}
 #' @export
@@ -1544,13 +1573,13 @@ est_cfarh <- function(f,weight,p=2,grid=1000,df_b=5, num_obs=NULL,x_pos=NULL){
 
   if(is.null(num_obs)){
     num_obs=dim(f)[2]
-    n=dim(f)[2]
+    n=dim(f)[2]-1
   }else{
-    n=max(num_obs)
+    n=max(num_obs)-1
   }
 
   if(length(num_obs)!=t){
-    num_obs=rep(n,t)
+    num_obs=rep(n+1,t)
   }
 
   if(is.null(x_pos)){
@@ -1581,7 +1610,7 @@ est_cfarh <- function(f,weight,p=2,grid=1000,df_b=5, num_obs=NULL,x_pos=NULL){
   bstar_grid= matrix(0, grid+1, coef_b)
   b_matrix= matrix(0, (grid+1), (grid+1))
   bstar_grid_full= matrix(0, (grid+1)*t,coef_b)
-  index=matrix(0,t,n)
+  index=matrix(0,t,n+1)
   for(i in 1:t){
     for(j in 1:num_obs[i]){
       index[i,j]=which(abs(x_pos[i,j]-x_grid)==min(abs(x_pos[i,j]-x_grid)))
@@ -1641,8 +1670,8 @@ est_cfarh <- function(f,weight,p=2,grid=1000,df_b=5, num_obs=NULL,x_pos=NULL){
       l=-sum(num_obs[2:t])/2*log(ehat)+1/2*log.mat	### the number defined in formula (14)
       return(-l);
     }
-    para4= exp(-1)
-    result4=optim(para4,pdf4, lower=0.001, upper=0.999, method='L-BFGS-B')
+    para4= exp(-5)
+    result4=optim(para4,pdf4, lower=0.0001, upper=0.9999, method='L-BFGS-B')
     mat1= matrix(0, df_b+1, df_b+1);
     mat2= matrix(0, df_b+1, 1);
     psi_invall=matrix(0,(n+1)*(t-1),(n+1))
@@ -1677,8 +1706,7 @@ est_cfarh <- function(f,weight,p=2,grid=1000,df_b=5, num_obs=NULL,x_pos=NULL){
       ehat= epart+ehat
     }
     rho_hat= -log(psi)
-    sigma_hat=ehat/sum(num_obs[2:t])*2*rho_hat
-
+    sigma_hat=sqrt(ehat/sum(num_obs[2:t]))
   }
   indep.p=indep
   if(p>1){
@@ -1733,8 +1761,8 @@ est_cfarh <- function(f,weight,p=2,grid=1000,df_b=5, num_obs=NULL,x_pos=NULL){
       l=-sum(num_obs[(p+1):t])/2*log(ehat)+1/2*log.mat	### the number defined in formula (14)
       return(-l);
     }
-    para4= exp(-1)
-    result4=optim(para4,pdf4, lower=0.001, upper=0.999, method='L-BFGS-B')
+    para4= exp(-5)
+    result4=optim(para4,pdf4, lower=0.0001, upper=0.9999, method='L-BFGS-B')
     mat1= matrix(0, p*(df_b+1), p*(df_b+1));
     mat2= matrix(0, p*(df_b+1), 1);
     psi_invall=matrix(0,(n+1)*(t-1),(n+1))
@@ -2306,10 +2334,10 @@ p_cfar_part  <- function(model, f, new.obs){
 #' @param output a logical value for output. Default is TRUE.
 #' @return uTAR.est returns a list with components:
 #' \item{data}{the data matrix, y.}
-#' \item{k}{the dimension of y.}
+#' \item{k}{the number of regimes.}
 #' \item{arorder}{AR orders of regimes 1 and 2.}
-#' \item{coefs}{a (p*k+1)-by-(2k) matrices. The first row shows the estimation results in regime 1, and the second row shows these in regime 2.}
-#' \item{sigma}{estimated innovational covariance matrices of regimes 1 and 2.}
+#' \item{coefs}{a k-by-(p+1) matrices, where \code{k} is the number of regimes. The i-th row shows the estimation results in regime i.}
+#' \item{sigma}{estimated innovational covariances for all the regimes.}
 #' \item{thr}{threshold value.}
 #' \item{residuals}{estimated innovations.}
 #' \item{sresi}{standardized residuals.}
@@ -2628,9 +2656,9 @@ p_cfar_part  <- function(model, f, new.obs){
   D
 }
 
-#' Generate Two-Regime (VAR) Models
+#' Generate Two-Regime (TAR) Models
 #'
-#' Generates two-regime multivariate vector auto-regressive models.
+#' Generates multivariate two-regime threshold autoregressive models.
 #' @param nob number of observations.
 #' @param thr threshold value.
 #' @param phi1 VAR coefficient matrix of regime 1.
@@ -2642,7 +2670,7 @@ p_cfar_part  <- function(model, f, new.obs){
 #' @param delay two elements (i,d) with "i" being the component index and "d" the delay for threshold variable.
 #' @param ini burn-in period.
 #' @return mTAR.sim returns a list with following components:
-#' \item{series}{a time series following the two-regime multivariate VAR model.}
+#' \item{series}{a time series following the multivariate two-regime  VAR model.}
 #' \item{at}{innovation of the time series.}
 #' \item{threshold}{threshold value.}
 #' \item{delay}{two elements (i,d) with "i" being the component index and "d" the delay for threshold variable.}
@@ -4927,7 +4955,7 @@ SISstep.fading=function(mm,xx,logww,yyy,par,xdim2,ydim){
 #' HH <- matrix(c(2.37409, -1.92936, 0.53028,0,1,0,0,0,0,1,0,0,0,0,1,0),ncol=4,byrow=TRUE)
 #' WW <- matrix(c(1,0,0,0),nrow=4)
 #' GG <- matrix(0.01*c(0.89409,2.68227,2.68227,0.89409),nrow=1)
-#' VV <- 1.3**15*0.001
+#' VV <- 1.3**15*0.0001
 #' par <- list(HH=HH,WW=WW,GG=GG,VV=VV)
 #' set.seed(1)
 #' simu <- simu_fading(200,par)

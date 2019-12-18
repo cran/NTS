@@ -4,8 +4,7 @@
 \alias{NNsetting}
 \title{Setting Up The Predictor Matrix in A Neural Network for Time Series Data}
 \usage{
-NNsetting(zt, locY = 1, nfore = 0, lags = c(1:5),
-  include.lagY = TRUE)
+NNsetting(zt, locY = 1, nfore = 0, lags = c(1:5), include.lagY = TRUE)
 }
 \arguments{
 \item{zt}{data matrix, including the dependent variable \code{Y(t)}.}

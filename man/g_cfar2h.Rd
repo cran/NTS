@@ -4,9 +4,17 @@
 \alias{g_cfar2h}
 \title{Generate a CFAR(2) Process with Heteroscedasticity and Irregular Observation Locations}
 \usage{
-g_cfar2h(tmax = 1001, grid = 1000, rho = 1, min_obs = 40,
-  pois = 5, phi_func1 = NULL, phi_func2 = NULL, weight = NULL,
-  ini = 100)
+g_cfar2h(
+  tmax = 1001,
+  grid = 1000,
+  rho = 1,
+  min_obs = 40,
+  pois = 5,
+  phi_func1 = NULL,
+  phi_func2 = NULL,
+  weight = NULL,
+  ini = 100
+)
 }
 \arguments{
 \item{tmax}{length of time.}

@@ -4,8 +4,15 @@
 \alias{mTAR.est}
 \title{Estimation of Multivariate TAR Models}
 \usage{
-mTAR.est(y, arorder = c(1, 1), thr = c(0), delay = c(1, 1),
-  thrV = NULL, include.mean = c(TRUE, TRUE), output = TRUE)
+mTAR.est(
+  y,
+  arorder = c(1, 1),
+  thr = c(0),
+  delay = c(1, 1),
+  thrV = NULL,
+  include.mean = c(TRUE, TRUE),
+  output = TRUE
+)
 }
 \arguments{
 \item{y}{vector time series.}

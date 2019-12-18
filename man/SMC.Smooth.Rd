@@ -4,8 +4,19 @@
 \alias{SMC.Smooth}
 \title{Generic Sequential Monte Carlo Smoothing with Marginal Weights}
 \usage{
-SMC.Smooth(SISstep, SISstep.Smooth, nobs, yy, mm, par, xx.init, xdim, ydim,
-  resample.sch, funH = identity)
+SMC.Smooth(
+  SISstep,
+  SISstep.Smooth,
+  nobs,
+  yy,
+  mm,
+  par,
+  xx.init,
+  xdim,
+  ydim,
+  resample.sch,
+  funH = identity
+)
 }
 \arguments{
 \item{SISstep}{a function that performs one propagation step using a proposal distribution.

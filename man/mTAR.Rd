@@ -4,8 +4,18 @@
 \alias{mTAR}
 \title{Estimation of a Multivariate Two-Regime SETAR Model}
 \usage{
-mTAR(y, p1, p2, thr = NULL, thrV = NULL, delay = c(1, 1),
-  Trim = c(0.1, 0.9), k0 = 300, include.mean = TRUE, score = "AIC")
+mTAR(
+  y,
+  p1,
+  p2,
+  thr = NULL,
+  thrV = NULL,
+  delay = c(1, 1),
+  Trim = c(0.1, 0.9),
+  k0 = 300,
+  include.mean = TRUE,
+  score = "AIC"
+)
 }
 \arguments{
 \item{y}{a (\code{nT}-by-\code{k}) data matrix of multivariate time series, where \code{nT} is the sample size and \code{k} is the dimension.}

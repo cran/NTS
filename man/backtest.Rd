@@ -4,8 +4,7 @@
 \alias{backtest}
 \title{Backtest}
 \usage{
-backtest(m1, rt, orig, h, xre = NULL, fixed = NULL,
-  include.mean = TRUE)
+backtest(m1, rt, orig, h, xre = NULL, fixed = NULL, include.mean = TRUE)
 }
 \arguments{
 \item{m1}{an ARIMA time series model object.}

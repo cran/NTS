@@ -4,9 +4,16 @@
 \alias{MSM.sim}
 \title{Generate Univariate 2-regime Markov Switching Models}
 \usage{
-MSM.sim(nob, order = c(1, 1), phi1 = NULL, phi2 = NULL,
-  epsilon = c(0.1, 0.1), sigma = c(1, 1), cnst = c(0, 0),
-  ini = 500)
+MSM.sim(
+  nob,
+  order = c(1, 1),
+  phi1 = NULL,
+  phi2 = NULL,
+  epsilon = c(0.1, 0.1),
+  sigma = c(1, 1),
+  cnst = c(0, 0),
+  ini = 500
+)
 }
 \arguments{
 \item{nob}{number of observations.}

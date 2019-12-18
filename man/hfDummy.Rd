@@ -4,8 +4,7 @@
 \alias{hfDummy}
 \title{Create Dummy Variables for High-Frequency Intraday Seasonality}
 \usage{
-hfDummy(int = 1, Fopen = 10, Tend = 10, days = 1, pooled = 1,
-  skipmin = 0)
+hfDummy(int = 1, Fopen = 10, Tend = 10, days = 1, pooled = 1, skipmin = 0)
 }
 \arguments{
 \item{int}{length of time interval in minutes.}

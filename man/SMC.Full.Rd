@@ -4,8 +4,19 @@
 \alias{SMC.Full}
 \title{Generic Sequential Monte Carlo Using Full Information Proposal Distribution}
 \usage{
-SMC.Full(SISstep.Full, nobs, yy, mm, par, xx.init, xdim, ydim,
-  resample.sch, delay = 0, funH = identity)
+SMC.Full(
+  SISstep.Full,
+  nobs,
+  yy,
+  mm,
+  par,
+  xx.init,
+  xdim,
+  ydim,
+  resample.sch,
+  delay = 0,
+  funH = identity
+)
 }
 \arguments{
 \item{SISstep.Full}{a function that performs one step propagation using a proposal distribution.

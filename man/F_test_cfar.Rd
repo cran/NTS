@@ -9,7 +9,7 @@ F_test_cfar(f, p.max = 6, df_b = 10, grid = 1000)
 \arguments{
 \item{f}{the functional time series.}
 
-\item{p.max}{maximum CFAR order. Default is 6.}
+\item{p.max}{the maximum CFAR order. Default is 6.}
 
 \item{df_b}{the degrees of freedom for natural cubic splines. Default is 10.}
 
@@ -19,7 +19,7 @@ F_test_cfar(f, p.max = 6, df_b = 10, grid = 1000)
 The function outputs F test statistics and their p-values.
 }
 \description{
-F test for a CFAR process to specify CFAR order.
+F test for a CFAR process to specify the CFAR order.
 }
 \references{
 Liu, X., Xiao, H., and Chen, R. (2016) Convolutional autoregressive models for functional time series. \emph{Journal of Econometrics}, 194, 263-282.

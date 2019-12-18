@@ -2,10 +2,20 @@
 % Please edit documentation in R/hello.R
 \name{mTAR.sim}
 \alias{mTAR.sim}
-\title{Generate Two-Regime (VAR) Models}
+\title{Generate Two-Regime (TAR) Models}
 \usage{
-mTAR.sim(nob, thr, phi1, phi2, sigma1, sigma2 = NULL, c1 = NULL,
-  c2 = NULL, delay = c(1, 1), ini = 500)
+mTAR.sim(
+  nob,
+  thr,
+  phi1,
+  phi2,
+  sigma1,
+  sigma2 = NULL,
+  c1 = NULL,
+  c2 = NULL,
+  delay = c(1, 1),
+  ini = 500
+)
 }
 \arguments{
 \item{nob}{number of observations.}
@@ -30,7 +40,7 @@ mTAR.sim(nob, thr, phi1, phi2, sigma1, sigma2 = NULL, c1 = NULL,
 }
 \value{
 mTAR.sim returns a list with following components:
-\item{series}{a time series following the two-regime multivariate VAR model.}
+\item{series}{a time series following the multivariate two-regime  VAR model.}
 \item{at}{innovation of the time series.}
 \item{threshold}{threshold value.}
 \item{delay}{two elements (i,d) with "i" being the component index and "d" the delay for threshold variable.}
@@ -38,7 +48,7 @@ mTAR.sim returns a list with following components:
 \item{n2}{number of observations in regime 2.}
 }
 \description{
-Generates two-regime multivariate vector auto-regressive models.
+Generates multivariate two-regime threshold autoregressive models.
 }
 \examples{
 phi1=matrix(c(0.5,0.7,0.3,0.2),2,2)

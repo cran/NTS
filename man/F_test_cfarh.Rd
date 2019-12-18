@@ -4,8 +4,15 @@
 \alias{F_test_cfarh}
 \title{F Test for a CFAR Process with Heteroscedasticity and Irregular Observation Locations}
 \usage{
-F_test_cfarh(f, weight, p.max = 3, grid = 1000, df_b = 10,
-  num_obs = NULL, x_pos = NULL)
+F_test_cfarh(
+  f,
+  weight,
+  p.max = 3,
+  grid = 1000,
+  df_b = 10,
+  num_obs = NULL,
+  x_pos = NULL
+)
 }
 \arguments{
 \item{f}{the functional time series.}

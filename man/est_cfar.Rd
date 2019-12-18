@@ -9,7 +9,7 @@ est_cfar(f, p = 3, df_b = 10, grid = 1000)
 \arguments{
 \item{f}{the functional time series.}
 
-\item{p}{CFAR order.}
+\item{p}{the CFAR order.}
 
 \item{df_b}{the degrees of freedom for natural cubic splines. Default is 10.}
 
@@ -17,8 +17,8 @@ est_cfar(f, p = 3, df_b = 10, grid = 1000)
 }
 \value{
 The function returns a list with components:
-\item{phi_coef}{estimated spline coefficients for convolutional function values, a (2*grid+1)-by-p matrix.}
-\item{phi_func}{estimated convolutional function(s), a (df_b+1)-by-p matrix.}
+\item{phi_coef}{the estimated spline coefficients for convolutional function values, a (2*grid+1)-by-p matrix.}
+\item{phi_func}{the estimated convolutional function(s), a (df_b+1)-by-p matrix.}
 \item{rho}{estimated rho for O-U process (noise process).}
 \item{sigma}{estimated sigma for O-U process (noise process).}
 }

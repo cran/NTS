@@ -4,8 +4,19 @@
 \alias{MKF.Full.RB}
 \title{Full Information Propagation Step under Mixture Kalman Filter}
 \usage{
-MKF.Full.RB(MKFstep.Full.RB, nobs, yy, mm, par, II.init, mu.init, SS.init,
-  xdim, ydim, resample.sch)
+MKF.Full.RB(
+  MKFstep.Full.RB,
+  nobs,
+  yy,
+  mm,
+  par,
+  II.init,
+  mu.init,
+  SS.init,
+  xdim,
+  ydim,
+  resample.sch
+)
 }
 \arguments{
 \item{MKFstep.Full.RB}{a function that performs one step propagation under mixture Kalman filter, with full information proposal distribution.

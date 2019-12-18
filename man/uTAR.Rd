@@ -4,8 +4,17 @@
 \alias{uTAR}
 \title{Estimation of a Univariate Two-Regime SETAR Model}
 \usage{
-uTAR(y, p1, p2, d = 1, thrV = NULL, Trim = c(0.1, 0.9), k0 = 300,
-  include.mean = TRUE, thrQ = c(0, 1))
+uTAR(
+  y,
+  p1,
+  p2,
+  d = 1,
+  thrV = NULL,
+  Trim = c(0.1, 0.9),
+  k0 = 300,
+  include.mean = TRUE,
+  thrQ = c(0, 1)
+)
 }
 \arguments{
 \item{y}{a vector of time series.}

@@ -4,8 +4,7 @@
 \alias{mTAR.pred}
 \title{Prediction of A Fitted Multivariate TAR Model}
 \usage{
-mTAR.pred(model, orig, h = 1, iterations = 3000, ci = 0.95,
-  output = TRUE)
+mTAR.pred(model, orig, h = 1, iterations = 3000, ci = 0.95, output = TRUE)
 }
 \arguments{
 \item{model}{multivariate TAR model.}

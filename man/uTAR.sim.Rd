@@ -4,8 +4,16 @@
 \alias{uTAR.sim}
 \title{Generate Univariate SETAR Models}
 \usage{
-uTAR.sim(nob, arorder, phi, d = 1, thr = c(0, 0), sigma = c(1, 1, 1),
-  cnst = rep(0, 3), ini = 500)
+uTAR.sim(
+  nob,
+  arorder,
+  phi,
+  d = 1,
+  thr = c(0, 0),
+  sigma = c(1, 1, 1),
+  cnst = rep(0, 3),
+  ini = 500
+)
 }
 \arguments{
 \item{nob}{number of observations.}

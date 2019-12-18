@@ -4,8 +4,16 @@
 \alias{uTAR.grid}
 \title{Search for Threshold Value of A Two-Regime SETAR Model}
 \usage{
-uTAR.grid(y, p1, p2, d = 1, thrV = NULL, thrQ = c(0, 1),
-  Trim = c(0.1, 0.9), include.mean = T)
+uTAR.grid(
+  y,
+  p1,
+  p2,
+  d = 1,
+  thrV = NULL,
+  thrQ = c(0, 1),
+  Trim = c(0.1, 0.9),
+  include.mean = T
+)
 }
 \arguments{
 \item{y}{a vector of time series.}

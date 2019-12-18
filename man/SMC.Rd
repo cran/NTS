@@ -4,8 +4,19 @@
 \alias{SMC}
 \title{Generic Sequential Monte Carlo Method}
 \usage{
-SMC(Sstep, nobs, yy, mm, par, xx.init, xdim, ydim, resample.sch,
-  delay = 0, funH = identity)
+SMC(
+  Sstep,
+  nobs,
+  yy,
+  mm,
+  par,
+  xx.init,
+  xdim,
+  ydim,
+  resample.sch,
+  delay = 0,
+  funH = identity
+)
 }
 \arguments{
 \item{Sstep}{a function that performs one step propagation using a proposal distribution.

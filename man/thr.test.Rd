@@ -4,8 +4,7 @@
 \alias{thr.test}
 \title{Threshold Nonlinearity Test}
 \usage{
-thr.test(y, p = 1, d = 1, thrV = NULL, ini = 40,
-  include.mean = T)
+thr.test(y, p = 1, d = 1, thrV = NULL, ini = 40, include.mean = T)
 }
 \arguments{
 \item{y}{a time series.}

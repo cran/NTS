@@ -4,8 +4,15 @@
 \alias{uTAR.est}
 \title{General Estimation of TAR Models}
 \usage{
-uTAR.est(y, arorder = c(1, 1), thr = c(0), d = 1, thrV = NULL,
-  include.mean = c(TRUE, TRUE), output = TRUE)
+uTAR.est(
+  y,
+  arorder = c(1, 1),
+  thr = c(0),
+  d = 1,
+  thrV = NULL,
+  include.mean = c(TRUE, TRUE),
+  output = TRUE
+)
 }
 \arguments{
 \item{y}{time series.}
@@ -25,10 +32,10 @@ uTAR.est(y, arorder = c(1, 1), thr = c(0), d = 1, thrV = NULL,
 \value{
 uTAR.est returns a list with components:
 \item{data}{the data matrix, y.}
-\item{k}{the dimension of y.}
+\item{k}{the number of regimes.}
 \item{arorder}{AR orders of regimes 1 and 2.}
-\item{coefs}{a (p*k+1)-by-(2k) matrices. The first row shows the estimation results in regime 1, and the second row shows these in regime 2.}
-\item{sigma}{estimated innovational covariance matrices of regimes 1 and 2.}
+\item{coefs}{a k-by-(p+1) matrices, where \code{k} is the number of regimes. The i-th row shows the estimation results in regime i.}
+\item{sigma}{estimated innovational covariances for all the regimes.}
 \item{thr}{threshold value.}
 \item{residuals}{estimated innovations.}
 \item{sresi}{standardized residuals.}

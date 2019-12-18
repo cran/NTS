@@ -4,8 +4,14 @@
 \alias{g_cfar}
 \title{Generate a CFAR Process}
 \usage{
-g_cfar(tmax = 1001, rho = 5, phi_list = NULL, grid = 1000,
-  sigma = 1, ini = 100)
+g_cfar(
+  tmax = 1001,
+  rho = 5,
+  phi_list = NULL,
+  grid = 1000,
+  sigma = 1,
+  ini = 100
+)
 }
 \arguments{
 \item{tmax}{length of time.}

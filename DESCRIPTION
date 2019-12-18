@@ -1,6 +1,7 @@
 Package: NTS
+Type: Package
 Title: Nonlinear Time Series Analysis
-Version: 1.0.1
+Version: 1.1.0
 Authors@R: c(
     person("Ruey", "Tsay", email = "ruey.tsay@chicagobooth.edu", role = "aut"),
     person("Rong", "Chen", email = "rongchen@stat.rutgers.edu", role = "aut"),
@@ -17,8 +18,9 @@ LazyData: true
 Imports:
         base,dlm,graphics,MASS,MSwM,Rdpack,parallel,splines,stats,tensor
 RdMacros: Rdpack
-RoxygenNote: 6.1.1
+RoxygenNote: 7.0.2
+Suggests: testthat
 NeedsCompilation: no
-Packaged: 2019-08-30 04:51:02 UTC; xliu
+Packaged: 2019-12-18 21:03:17 UTC; Xialu
 Repository: CRAN
-Date/Publication: 2019-08-30 05:10:02 UTC
+Date/Publication: 2019-12-18 23:10:02 UTC

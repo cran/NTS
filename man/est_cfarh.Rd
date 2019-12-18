@@ -4,15 +4,22 @@
 \alias{est_cfarh}
 \title{Estimation of a CFAR Process with Heteroscedasticity and Irregualar Observation Locations}
 \usage{
-est_cfarh(f, weight, p = 2, grid = 1000, df_b = 5, num_obs = NULL,
-  x_pos = NULL)
+est_cfarh(
+  f,
+  weight,
+  p = 2,
+  grid = 1000,
+  df_b = 5,
+  num_obs = NULL,
+  x_pos = NULL
+)
 }
 \arguments{
 \item{f}{the functional time series.}
 
 \item{weight}{the covariance functions of noise process.}
 
-\item{p}{CFAR order.}
+\item{p}{the CFAR order.}
 
 \item{grid}{the number of gird points used to construct the functional time series and noise process. Default is 1000.}
 
@@ -24,8 +31,8 @@ est_cfarh(f, weight, p = 2, grid = 1000, df_b = 5, num_obs = NULL,
 }
 \value{
 The function returns a list with components:
-\item{phi_coef}{estimated spline coefficients for convolutional function(s).}
-\item{phi_func}{estimated convolutional function(s).}
+\item{phi_coef}{the estimated spline coefficients for convolutional function(s).}
+\item{phi_func}{the estimated convolutional function(s).}
 \item{rho}{estimated rho for O-U process (noise process).}
 \item{sigma}{estimated sigma for O-U process (noise process).}
 }

@@ -4,8 +4,17 @@
 \alias{SMC.Full.RB}
 \title{Generic Sequential Monte Carlo Using Full Information Proposal Distribution and Rao-Blackwellization}
 \usage{
-SMC.Full.RB(SISstep.Full.RB, nobs, yy, mm, par, xx.init, xdim, ydim,
-  resample.sch)
+SMC.Full.RB(
+  SISstep.Full.RB,
+  nobs,
+  yy,
+  mm,
+  par,
+  xx.init,
+  xdim,
+  ydim,
+  resample.sch
+)
 }
 \arguments{
 \item{SISstep.Full.RB}{a function that performs one step propagation using a proposal distribution.
