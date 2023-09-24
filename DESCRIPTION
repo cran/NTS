@@ -1,7 +1,7 @@
 Package: NTS
 Type: Package
 Title: Nonlinear Time Series Analysis
-Version: 1.1.2
+Version: 1.1.3
 Authors@R: c(
     person("Ruey", "Tsay", email = "ruey.tsay@chicagobooth.edu", role = "aut"),
     person("Rong", "Chen", email = "rongchen@stat.rutgers.edu", role = "aut"),
@@ -14,13 +14,12 @@ Description: Simulation, estimation, prediction procedure, and model identificat
 Depends: R (>= 3.6.0)
 License: GPL (>= 2)
 Encoding: UTF-8
-LazyData: true
 Imports:
         base,dlm,graphics,MASS,MSwM,Rdpack,parallel,splines,stats,tensor
 RdMacros: Rdpack
-RoxygenNote: 7.1.1
+RoxygenNote: 7.2.3
 Suggests: testthat
 NeedsCompilation: no
-Packaged: 2020-08-05 20:16:43 UTC; Xialu
+Packaged: 2023-09-24 20:11:22 UTC; Xialu
 Repository: CRAN
-Date/Publication: 2020-08-06 12:40:07 UTC
+Date/Publication: 2023-09-24 21:10:06 UTC
